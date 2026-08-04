@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 
 import { MarketDarkTheme, MarketLightTheme, NavDarkTheme, NavLightTheme } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { CartProvider } from '@/store/cart';
 import { ProductsProvider } from '@/store/products';
 
 export const unstable_settings = {
@@ -51,11 +52,17 @@ export default function RootLayout() {
       <PaperProvider theme={paperTheme} settings={paperSettings}>
         <ThemeProvider value={navigationTheme}>
           <ProductsProvider>
-            {/* Every screen draws its own Material 3 top app bar. */}
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="product/[id]" />
-            </Stack>
+            <CartProvider>
+              {/* Every screen draws its own Material 3 top app bar. */}
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="product/[id]" />
+                <Stack.Screen name="checkout" />
+                {/* The confirmation replaces checkout in the stack, so Back
+                    from here returns to the market rather than the form. */}
+                <Stack.Screen name="order/[id]" options={{ gestureEnabled: false }} />
+              </Stack>
+            </CartProvider>
           </ProductsProvider>
           <StatusBar style={isDark ? 'light' : 'dark'} />
         </ThemeProvider>

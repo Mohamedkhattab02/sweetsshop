@@ -3,9 +3,11 @@ import { Tabs } from 'expo-router';
 import { useTheme } from 'react-native-paper';
 
 import { HapticTab } from '@/components/haptic-tab';
+import { useCart } from '@/store/cart';
 
 export default function TabLayout() {
   const theme = useTheme();
+  const { itemCount } = useCart();
 
   return (
     <Tabs
@@ -41,6 +43,24 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
               name={focused ? 'plus-box' : 'plus-box-outline'}
+              size={26}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="cart"
+        options={{
+          title: 'Cart',
+          tabBarBadge: itemCount > 0 ? itemCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: theme.colors.error,
+            color: theme.colors.onError,
+          },
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'cart' : 'cart-outline'}
               size={26}
               color={color}
             />

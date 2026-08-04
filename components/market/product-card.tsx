@@ -9,9 +9,10 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Badge, Card, Text, useTheme } from 'react-native-paper';
+import { Badge, Card, IconButton, Text, useTheme } from 'react-native-paper';
 
 import { formatPrice, getCategory } from '@/constants/market';
+import { useCart } from '@/store/cart';
 import type { Product } from '@/store/products';
 
 type Props = {
@@ -22,8 +23,10 @@ type Props = {
 export function ProductCard({ product, onPress }: Props) {
   const theme = useTheme();
   const [failed, setFailed] = useState(false);
+  const { addToCart, getQuantity } = useCart();
   const category = getCategory(product.category);
   const showPlaceholder = !product.image || failed;
+  const inCart = getQuantity(product.id);
 
   return (
     <Card mode="outlined" style={styles.card} onPress={onPress}>
@@ -70,12 +73,39 @@ export function ProductCard({ product, onPress }: Props) {
           {product.name}
         </Text>
         <View style={styles.priceRow}>
-          <Text variant="titleMedium" style={{ color: theme.colors.primary }}>
-            {formatPrice(product.price)}
-          </Text>
-          <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-            {` / ${product.unit}`}
-          </Text>
+          <View style={styles.priceText}>
+            <Text variant="titleMedium" style={{ color: theme.colors.primary }}>
+              {formatPrice(product.price)}
+            </Text>
+            <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+              {` / ${product.unit}`}
+            </Text>
+          </View>
+
+          <View>
+            <IconButton
+              icon={inCart > 0 ? 'cart-check' : 'cart-plus'}
+              mode="contained-tonal"
+              size={18}
+              style={styles.cartButton}
+              onPress={() => addToCart(product)}
+              accessibilityLabel={
+                inCart > 0
+                  ? `Add another ${product.name} to the cart. ${inCart} already in the cart.`
+                  : `Add ${product.name} to the cart`
+              }
+            />
+            {inCart > 0 ? (
+              <Badge
+                size={18}
+                style={[
+                  styles.cartBadge,
+                  { backgroundColor: theme.colors.primary, color: theme.colors.onPrimary },
+                ]}>
+                {inCart}
+              </Badge>
+            ) : null}
+          </View>
         </View>
       </Card.Content>
     </Card>
@@ -117,7 +147,21 @@ const styles = StyleSheet.create({
   },
   priceRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: 2,
+  },
+  priceText: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexShrink: 1,
+  },
+  cartButton: {
+    margin: 0,
+  },
+  cartBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
   },
 });

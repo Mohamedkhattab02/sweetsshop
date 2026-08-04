@@ -8,13 +8,14 @@
 
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { AnimatedFAB, Appbar, Button, Text, useTheme } from 'react-native-paper';
+import { AnimatedFAB, Appbar, Badge, Button, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMemo, useState } from 'react';
 
 import { CategoryFilter } from '@/components/market/category-filter';
 import { OpenHoursCard } from '@/components/market/open-hours-card';
 import { ProductCard } from '@/components/market/product-card';
+import { useCart } from '@/store/cart';
 import { useProducts, type Product } from '@/store/products';
 
 /** Grid cells are `flex: 1`, so an odd count needs a filler to stop the last
@@ -27,6 +28,7 @@ export default function MarketScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [fabExtended, setFabExtended] = useState(true);
+  const { itemCount } = useCart();
 
   const {
     visibleProducts,
@@ -49,11 +51,25 @@ export default function MarketScreen() {
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
         <Appbar.Content title="Green Lane Market" />
-        <Appbar.Action
-          icon="plus"
-          accessibilityLabel="Add a product"
-          onPress={() => router.navigate('/add')}
-        />
+        <View>
+          <Appbar.Action
+            icon={itemCount > 0 ? 'cart' : 'cart-outline'}
+            accessibilityLabel={
+              itemCount > 0 ? `Open the cart, ${itemCount} items` : 'Open the cart, empty'
+            }
+            onPress={() => router.navigate('/cart')}
+          />
+          {itemCount > 0 ? (
+            <Badge
+              size={18}
+              style={[
+                styles.appbarBadge,
+                { backgroundColor: theme.colors.error, color: theme.colors.onError },
+              ]}>
+              {itemCount}
+            </Badge>
+          ) : null}
+        </View>
       </Appbar.Header>
 
       <FlatList
@@ -174,5 +190,10 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 16,
+  },
+  appbarBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 2,
   },
 });

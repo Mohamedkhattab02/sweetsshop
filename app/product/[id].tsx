@@ -7,10 +7,20 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Appbar, Button, Chip, Divider, Text, useTheme } from 'react-native-paper';
+import {
+  Appbar,
+  Button,
+  Chip,
+  Divider,
+  IconButton,
+  Snackbar,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { formatPrice, getCategory, getMarketStatus } from '@/constants/market';
+import { MAX_QUANTITY_PER_LINE, useCart } from '@/store/cart';
 import { useProducts } from '@/store/products';
 
 export default function ProductDetailScreen() {
@@ -19,7 +29,10 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getProductById } = useProducts();
+  const { addToCart, getQuantity, itemCount } = useCart();
   const [failed, setFailed] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [snackbar, setSnackbar] = useState<string | null>(null);
 
   const product = getProductById(id);
   const status = getMarketStatus();
@@ -43,12 +56,26 @@ export default function ProductDetailScreen() {
 
   const category = getCategory(product.category);
   const showPlaceholder = !product.image || failed;
+  const alreadyInCart = getQuantity(product.id);
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    setSnackbar(
+      `${quantity} × ${product.name} ${quantity === 1 ? 'was' : 'were'} added to your cart.`
+    );
+    setQuantity(1);
+  };
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
         <Appbar.BackAction onPress={() => router.back()} accessibilityLabel="Back to the market" />
         <Appbar.Content title={product.name} />
+        <Appbar.Action
+          icon={itemCount > 0 ? 'cart' : 'cart-outline'}
+          accessibilityLabel={`Open the cart, ${itemCount} items`}
+          onPress={() => router.navigate('/cart')}
+        />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}>
@@ -115,16 +142,69 @@ export default function ProductDetailScreen() {
             </Text>
           </View>
 
+          {alreadyInCart > 0 ? (
+            <View style={styles.statusRow}>
+              <MaterialCommunityIcons
+                name="cart-check"
+                size={22}
+                color={theme.colors.primary}
+              />
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                {`${alreadyInCart} already in your cart`}
+              </Text>
+            </View>
+          ) : null}
+
+          {/* ---------------------------- Quantity --------------------------- */}
+          <View style={styles.quantityRow}>
+            <Text variant="titleMedium">Quantity</Text>
+            <View style={styles.stepper}>
+              <IconButton
+                icon="minus"
+                mode="outlined"
+                size={18}
+                disabled={quantity <= 1}
+                onPress={() => setQuantity((value) => Math.max(1, value - 1))}
+                accessibilityLabel="Decrease quantity"
+              />
+              <Text variant="titleLarge" style={styles.quantityValue}>
+                {quantity}
+              </Text>
+              <IconButton
+                icon="plus"
+                mode="outlined"
+                size={18}
+                disabled={quantity >= MAX_QUANTITY_PER_LINE}
+                onPress={() =>
+                  setQuantity((value) => Math.min(MAX_QUANTITY_PER_LINE, value + 1))
+                }
+                accessibilityLabel="Increase quantity"
+              />
+            </View>
+          </View>
+
           <Button
             mode="contained"
-            icon="storefront-outline"
-            onPress={() => router.back()}
+            icon="cart-plus"
+            onPress={handleAddToCart}
             contentStyle={styles.ctaContent}
             style={styles.cta}>
-            Back to the market
+            {`Add to cart · ${formatPrice(product.price * quantity)}`}
+          </Button>
+
+          <Button mode="text" icon="storefront-outline" onPress={() => router.back()}>
+            Keep shopping
           </Button>
         </View>
       </ScrollView>
+
+      <Snackbar
+        visible={snackbar !== null}
+        onDismiss={() => setSnackbar(null)}
+        duration={4000}
+        action={{ label: 'View cart', onPress: () => router.navigate('/cart') }}>
+        {snackbar}
+      </Snackbar>
     </View>
   );
 }
@@ -178,8 +258,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  quantityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quantityValue: {
+    minWidth: 44,
+    textAlign: 'center',
+  },
   cta: {
-    marginTop: 12,
+    marginTop: 4,
   },
   ctaContent: {
     paddingVertical: 6,
