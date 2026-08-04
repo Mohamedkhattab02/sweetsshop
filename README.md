@@ -1,50 +1,55 @@
-# Welcome to your Expo app 👋
+# Green Lane Market
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A sample market app built with [Expo](https://expo.dev) (SDK 54), [Expo Router](https://docs.expo.dev/router/introduction/)
+and [React Native Paper v5](https://callstack.github.io/react-native-paper/), which implements Google's
+**Material Design 3** component set.
 
-## Get started
+## What it does
 
-1. Install dependencies
+- **Opening hours at the top of the main page** — a banner shows whether the market is open right
+  now and when it next opens or closes. Tap it to expand the full week. It re-checks itself every
+  30 seconds.
+- **Browse products by category** — Material 3 filter chips across the top of the list. The
+  selection is *multi-select*: pick Fruits and Dairy to see both. "All" clears the filter.
+- **Upload a new product** — the second tab. Name, category, price and photo are all required;
+  the photo comes from the device gallery or the camera. Unit and description are optional. New
+  products appear at the top of the market immediately, badged "New".
+- **Product detail** — tap any card for the full-size photo, price and description.
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Running it
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then open the project in Expo Go, an Android emulator, or an iOS simulator. Everything works in
+Expo Go — no custom development build is needed.
 
-## Learn more
+## Project layout
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+app/
+  _layout.tsx           Paper MD3 theme + product store providers
+  (tabs)/
+    _layout.tsx         Bottom navigation (Market / Add product)
+    index.tsx           Main page: open hours, category filter, product grid
+    add.tsx             New-product form with validation and image picker
+  product/[id].tsx      Product detail
+components/market/      Open-hours banner, category filter, product card
+constants/
+  market.ts             Categories, the opening schedule, price formatting
+  theme.ts              Material 3 colour scheme (light + dark)
+store/products.tsx      In-memory product store (React context + reducer)
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Notes
 
-## Join the community
+This is a sample app, so **there is no database**. Products live in React state via
+`store/products.tsx` and reset when the app restarts. Swapping in a real backend means replacing
+the reducer inside `ProductsProvider` — the screens only talk to it through the `useProducts()`
+hook.
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Seed product photos are hotlinked from Unsplash, so the starting catalogue needs a network
+connection. Uploaded photos are local `file://` URIs and work offline. If any image fails to load,
+the card falls back to a tinted category glyph.

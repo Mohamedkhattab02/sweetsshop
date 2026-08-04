@@ -1,98 +1,178 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+/**
+ * Main page — the market itself.
+ *
+ * Top to bottom: the Material 3 top app bar, the opening-hours banner, the
+ * multi-select category filter, and the product grid for whatever categories
+ * are currently selected.
+ */
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { AnimatedFAB, Appbar, Button, Text, useTheme } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useMemo, useState } from 'react';
 
-export default function HomeScreen() {
+import { CategoryFilter } from '@/components/market/category-filter';
+import { OpenHoursCard } from '@/components/market/open-hours-card';
+import { ProductCard } from '@/components/market/product-card';
+import { useProducts, type Product } from '@/store/products';
+
+/** Grid cells are `flex: 1`, so an odd count needs a filler to stop the last
+ *  card stretching across the full row. */
+const FILLER = 'grid-filler' as const;
+type GridItem = Product | typeof FILLER;
+
+export default function MarketScreen() {
+  const theme = useTheme();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const [fabExtended, setFabExtended] = useState(true);
+
+  const {
+    visibleProducts,
+    selectedCategories,
+    toggleCategory,
+    clearCategories,
+    countByCategory,
+    products,
+  } = useProducts();
+
+  const isFiltered = selectedCategories.length > 0;
+
+  const gridData = useMemo<GridItem[]>(
+    () =>
+      visibleProducts.length % 2 === 1 ? [...visibleProducts, FILLER] : [...visibleProducts],
+    [visibleProducts]
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
+        <Appbar.Content title="Green Lane Market" />
+        <Appbar.Action
+          icon="plus"
+          accessibilityLabel="Add a product"
+          onPress={() => router.navigate('/add')}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+      </Appbar.Header>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <FlatList
+        data={gridData}
+        keyExtractor={(item, index) => (item === FILLER ? `filler-${index}` : item.id)}
+        numColumns={2}
+        columnWrapperStyle={styles.column}
+        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 96 }]}
+        showsVerticalScrollIndicator={false}
+        // Collapse the FAB while scrolling so it never hides a product.
+        onScroll={({ nativeEvent }) => setFabExtended(nativeEvent.contentOffset.y <= 8)}
+        scrollEventThrottle={32}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <View style={styles.headerPadded}>
+              <OpenHoursCard />
+            </View>
+
+            <CategoryFilter
+              selected={selectedCategories}
+              onToggle={toggleCategory}
+              onClear={clearCategories}
+              counts={countByCategory}
+            />
+
+            <View style={[styles.headerPadded, styles.resultRow]}>
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                {isFiltered
+                  ? `${visibleProducts.length} of ${products.length} products`
+                  : `${products.length} products in the market`}
+              </Text>
+              {isFiltered ? (
+                <Button compact mode="text" onPress={clearCategories}>
+                  Clear filter
+                </Button>
+              ) : null}
+            </View>
+          </View>
+        }
+        renderItem={({ item }) =>
+          item === FILLER ? (
+            <View style={styles.filler} />
+          ) : (
+            <ProductCard product={item} onPress={() => router.push(`/product/${item.id}`)} />
+          )
+        }
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text variant="titleMedium" style={styles.emptyTitle}>
+              Nothing in these categories yet
+            </Text>
+            <Text
+              variant="bodyMedium"
+              style={[styles.emptyBody, { color: theme.colors.onSurfaceVariant }]}>
+              Pick different categories, or add the first product yourself.
+            </Text>
+            <Button mode="contained-tonal" onPress={() => router.navigate('/add')}>
+              Add a product
+            </Button>
+          </View>
+        }
+      />
+
+      <AnimatedFAB
+        icon="plus"
+        label="Add product"
+        extended={fabExtended}
+        onPress={() => router.navigate('/add')}
+        accessibilityLabel="Add a new product to the market"
+        style={[styles.fab, { bottom: insets.bottom + 16 }]}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  screen: {
+    flex: 1,
+  },
+  listContent: {
+    paddingHorizontal: 16,
+  },
+  header: {
+    gap: 20,
+    marginBottom: 16,
+    // Cancel the list padding so the chip row can scroll edge to edge.
+    marginHorizontal: -16,
+  },
+  headerPadded: {
+    paddingHorizontal: 16,
+  },
+  resultRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    minHeight: 36,
   },
-  stepContainer: {
+  column: {
+    gap: 12,
+    marginBottom: 12,
+  },
+  filler: {
+    flex: 1,
+  },
+  empty: {
+    alignItems: 'center',
     gap: 8,
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+  },
+  emptyTitle: {
+    textAlign: 'center',
+  },
+  emptyBody: {
+    textAlign: 'center',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  fab: {
     position: 'absolute',
+    right: 16,
   },
 });

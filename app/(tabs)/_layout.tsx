@@ -1,33 +1,50 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router';
-import React from 'react';
+import { useTheme } from 'react-native-paper';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const theme = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '500' },
+        // Material 3 navigation bars sit on a slightly raised surface tone.
+        tabBarStyle: {
+          backgroundColor: theme.colors.elevation.level2,
+          borderTopColor: theme.colors.surfaceVariant,
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Market',
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'storefront' : 'storefront-outline'}
+              size={26}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="add"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Add product',
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'plus-box' : 'plus-box-outline'}
+              size={26}
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>
