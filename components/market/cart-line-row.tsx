@@ -6,12 +6,13 @@
  * removing a line never needs a separate control.
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { IconButton, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
+import { AppIcon } from '@/components/ui/app-icon';
+import { iconSource } from '@/components/ui/icon-source';
 import { formatPrice, getCategory } from '@/constants/market';
 import { MAX_QUANTITY_PER_LINE, type CartLine } from '@/store/cart';
 
@@ -35,11 +36,7 @@ export function CartLineRow({ line, onChangeQuantity, onRemove, onPress }: Props
       <View style={styles.rowInner}>
         {showPlaceholder ? (
           <View style={[styles.thumb, { backgroundColor: theme.colors.secondaryContainer }]}>
-            <MaterialCommunityIcons
-              name={category.icon as never}
-              size={28}
-              color={theme.colors.onSecondaryContainer}
-            />
+            <AppIcon name={category.icon} size={28} color={theme.colors.onSecondaryContainer} />
           </View>
         ) : (
           <Image
@@ -61,7 +58,7 @@ export function CartLineRow({ line, onChangeQuantity, onRemove, onPress }: Props
 
           <View style={styles.stepper}>
             <IconButton
-              icon={quantity === 1 ? 'delete-outline' : 'minus'}
+              icon={iconSource(quantity === 1 ? 'delete' : 'minus')}
               mode="outlined"
               size={16}
               style={styles.stepperButton}
@@ -74,7 +71,7 @@ export function CartLineRow({ line, onChangeQuantity, onRemove, onPress }: Props
               {quantity}
             </Text>
             <IconButton
-              icon="plus"
+              icon={iconSource('plus')}
               mode="outlined"
               size={16}
               disabled={atMax}

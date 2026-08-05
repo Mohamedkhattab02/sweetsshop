@@ -2,13 +2,11 @@
  * Product detail — opened by tapping a card in the market grid.
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
-  Appbar,
   Button,
   Chip,
   Divider,
@@ -19,6 +17,9 @@ import {
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppIcon } from '@/components/ui/app-icon';
+import { iconSource } from '@/components/ui/icon-source';
+import { ScreenHeader, useScreenHeaderInset } from '@/components/ui/screen-header';
 import { formatPrice, getCategory, getMarketStatus } from '@/constants/market';
 import { MAX_QUANTITY_PER_LINE, useCart } from '@/store/cart';
 import { useProducts } from '@/store/products';
@@ -27,6 +28,7 @@ export default function ProductDetailScreen() {
   const theme = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const headerInset = useScreenHeaderInset();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getProductById } = useProducts();
   const { addToCart, getQuantity, itemCount } = useCart();
@@ -40,10 +42,7 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-        <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-          <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Product" />
-        </Appbar.Header>
+        <ScreenHeader title="Product" onBack={() => router.back()} />
         <View style={styles.missing}>
           <Text variant="titleMedium">This product is no longer in the market.</Text>
           <Button mode="contained-tonal" onPress={() => router.back()}>
@@ -68,25 +67,28 @@ export default function ProductDetailScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-        <Appbar.BackAction onPress={() => router.back()} accessibilityLabel="Back to the market" />
-        <Appbar.Content title={product.name} />
-        <Appbar.Action
-          icon={itemCount > 0 ? 'cart' : 'cart-outline'}
-          accessibilityLabel={`Open the cart, ${itemCount} items`}
-          onPress={() => router.navigate('/cart')}
-        />
-      </Appbar.Header>
+      <ScreenHeader
+        title={product.name}
+        onBack={() => router.back()}
+        actions={[
+          {
+            icon: itemCount > 0 ? 'cartFilled' : 'cart',
+            label: `Open the cart, ${itemCount} items`,
+            onPress: () => router.navigate('/cart'),
+            badge: itemCount,
+          },
+        ]}
+      />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: headerInset + 16, paddingBottom: insets.bottom + 32 },
+        ]}>
         <View style={styles.heroWrapper}>
           {showPlaceholder ? (
             <View style={[styles.hero, { backgroundColor: theme.colors.secondaryContainer }]}>
-              <MaterialCommunityIcons
-                name={category.icon as never}
-                size={72}
-                color={theme.colors.onSecondaryContainer}
-              />
+              <AppIcon name={category.icon} size={72} color={theme.colors.onSecondaryContainer} />
             </View>
           ) : (
             <Image
@@ -102,11 +104,11 @@ export default function ProductDetailScreen() {
 
         <View style={styles.body}>
           <View style={styles.chipRow}>
-            <Chip icon={category.icon} compact mode="flat">
+            <Chip icon={iconSource(category.icon)} compact mode="flat">
               {category.label}
             </Chip>
             {product.isNew ? (
-              <Chip icon="star-four-points" compact mode="flat">
+              <Chip icon={iconSource('sparkle')} compact mode="flat">
                 Just added
               </Chip>
             ) : null}
@@ -132,8 +134,8 @@ export default function ProductDetailScreen() {
           <Divider style={styles.divider} />
 
           <View style={styles.statusRow}>
-            <MaterialCommunityIcons
-              name={status.isOpen ? 'store-check' : 'store-clock'}
+            <AppIcon
+              name={status.isOpen ? 'storeOpen' : 'storeClosed'}
               size={22}
               color={status.isOpen ? theme.colors.primary : theme.colors.error}
             />
@@ -144,11 +146,7 @@ export default function ProductDetailScreen() {
 
           {alreadyInCart > 0 ? (
             <View style={styles.statusRow}>
-              <MaterialCommunityIcons
-                name="cart-check"
-                size={22}
-                color={theme.colors.primary}
-              />
+              <AppIcon name="cartAdded" size={22} color={theme.colors.primary} />
               <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
                 {`${alreadyInCart} already in your cart`}
               </Text>
@@ -160,7 +158,7 @@ export default function ProductDetailScreen() {
             <Text variant="titleMedium">Quantity</Text>
             <View style={styles.stepper}>
               <IconButton
-                icon="minus"
+                icon={iconSource('minus')}
                 mode="outlined"
                 size={18}
                 disabled={quantity <= 1}
@@ -171,7 +169,7 @@ export default function ProductDetailScreen() {
                 {quantity}
               </Text>
               <IconButton
-                icon="plus"
+                icon={iconSource('plus')}
                 mode="outlined"
                 size={18}
                 disabled={quantity >= MAX_QUANTITY_PER_LINE}
@@ -185,14 +183,14 @@ export default function ProductDetailScreen() {
 
           <Button
             mode="contained"
-            icon="cart-plus"
+            icon={iconSource('cartAdd')}
             onPress={handleAddToCart}
             contentStyle={styles.ctaContent}
             style={styles.cta}>
             {`Add to cart · ${formatPrice(product.price * quantity)}`}
           </Button>
 
-          <Button mode="text" icon="storefront-outline" onPress={() => router.back()}>
+          <Button mode="text" icon={iconSource('store')} onPress={() => router.back()}>
             Keep shopping
           </Button>
         </View>

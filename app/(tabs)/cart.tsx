@@ -3,14 +3,17 @@
  * pinned above the tab bar that leads into checkout.
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { Appbar, Button, Dialog, Divider, Portal, Surface, Text, useTheme } from 'react-native-paper';
+import { Button, Dialog, Divider, Portal, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CartLineRow } from '@/components/market/cart-line-row';
+import { AppIcon } from '@/components/ui/app-icon';
+import { GlassSurface } from '@/components/ui/glass-surface';
+import { iconSource } from '@/components/ui/icon-source';
+import { ScreenHeader, useScreenHeaderInset } from '@/components/ui/screen-header';
 import { formatPrice, getMarketStatus } from '@/constants/market';
 import { useCart } from '@/store/cart';
 
@@ -18,6 +21,7 @@ export default function CartScreen() {
   const theme = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const headerInset = useScreenHeaderInset(true);
   const { lines, itemCount, subtotal, isEmpty, setQuantity, removeFromCart, clearCart } = useCart();
   const [confirmClear, setConfirmClear] = useState(false);
 
@@ -25,35 +29,37 @@ export default function CartScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-        {/* MD3 top app bars have no subtitle slot, so the item count goes in
-            the title rather than a `subtitle` prop (which Paper ignores in v3). */}
-        <Appbar.Content
-          title={isEmpty ? 'Your cart' : `Your cart · ${itemCount}`}
-        />
-        {!isEmpty ? (
-          <Appbar.Action
-            icon="delete-sweep-outline"
-            accessibilityLabel="Empty the cart"
-            onPress={() => setConfirmClear(true)}
-          />
-        ) : null}
-      </Appbar.Header>
+      {/* MD3 top app bars have no subtitle slot, so the item count goes in
+          the title rather than a `subtitle` prop (which Paper ignores in v3). */}
+      <ScreenHeader
+        title={isEmpty ? 'Your cart' : `Your cart · ${itemCount}`}
+        large
+        actions={
+          isEmpty
+            ? []
+            : [
+                {
+                  icon: 'cartEmpty',
+                  label: 'Empty the cart',
+                  onPress: () => setConfirmClear(true),
+                },
+              ]
+        }
+      />
 
       {isEmpty ? (
-        <View style={styles.empty}>
-          <MaterialCommunityIcons
-            name="cart-outline"
-            size={72}
-            color={theme.colors.onSurfaceVariant}
-          />
+        <View style={[styles.empty, { paddingTop: headerInset + 32 }]}>
+          <AppIcon name="cart" size={72} color={theme.colors.onSurfaceVariant} />
           <Text variant="titleMedium">Your cart is empty</Text>
           <Text
             variant="bodyMedium"
             style={[styles.emptyBody, { color: theme.colors.onSurfaceVariant }]}>
             Browse the market and tap the cart button on any product to add it here.
           </Text>
-          <Button mode="contained" icon="storefront-outline" onPress={() => router.navigate('/')}>
+          <Button
+            mode="contained"
+            icon={iconSource('store')}
+            onPress={() => router.navigate('/')}>
             Browse the market
           </Button>
         </View>
@@ -62,7 +68,7 @@ export default function CartScreen() {
           <FlatList
             data={lines}
             keyExtractor={(line) => line.product.id}
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[styles.listContent, { paddingTop: headerInset + 8 }]}
             ItemSeparatorComponent={() => <Divider />}
             renderItem={({ item }) => (
               <CartLineRow
@@ -74,8 +80,12 @@ export default function CartScreen() {
             )}
           />
 
-          <Surface
-            elevation={3}
+          {/* Liquid Glass on iOS so the list shows through as it scrolls under
+              the bar; a raised Material surface on Android. */}
+          <GlassSurface
+            variant="regular"
+            androidElevation={3}
+            androidBackgroundColor={theme.colors.elevation.level3}
             style={[styles.summary, { paddingBottom: insets.bottom > 0 ? 12 : 16 }]}>
             <View style={styles.summaryRow}>
               <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
@@ -88,11 +98,7 @@ export default function CartScreen() {
 
             {!status.isOpen ? (
               <View style={styles.notice}>
-                <MaterialCommunityIcons
-                  name="information-outline"
-                  size={18}
-                  color={theme.colors.onSurfaceVariant}
-                />
+                <AppIcon name="info" size={18} color={theme.colors.onSurfaceVariant} />
                 <Text
                   variant="bodySmall"
                   style={[styles.noticeText, { color: theme.colors.onSurfaceVariant }]}>
@@ -103,18 +109,18 @@ export default function CartScreen() {
 
             <Button
               mode="contained"
-              icon="clipboard-check-outline"
+              icon={iconSource('checkout')}
               onPress={() => router.push('/checkout')}
               contentStyle={styles.checkoutContent}>
               Proceed to checkout
             </Button>
-          </Surface>
+          </GlassSurface>
         </>
       )}
 
       <Portal>
         <Dialog visible={confirmClear} onDismiss={() => setConfirmClear(false)}>
-          <Dialog.Icon icon="delete-sweep-outline" />
+          <Dialog.Icon icon={iconSource('cartEmpty')} />
           <Dialog.Title style={styles.dialogTitle}>Empty your cart?</Dialog.Title>
           <Dialog.Content>
             <Text variant="bodyMedium">

@@ -4,13 +4,18 @@
  * Collapsed it shows whether the market is open right now and today's hours;
  * tapping it expands the full week. The status recomputes on a timer so the
  * banner stays correct if the screen is left open across an opening time.
+ *
+ * The container is a `GlassSurface`: Liquid Glass tinted green/red on iOS, a
+ * tonal Material container on Android. Text uses `onSurface` so it stays
+ * legible over either.
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Divider, Surface, Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { Divider, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
+import { AppIcon } from '@/components/ui/app-icon';
+import { GlassSurface } from '@/components/ui/glass-surface';
 import {
   DAY_NAMES_SHORT,
   OPENING_HOURS,
@@ -20,6 +25,10 @@ import {
 } from '@/constants/market';
 
 const REFRESH_INTERVAL_MS = 30_000;
+
+/** iOS systemGreen / systemRed, held back to a wash the glass can carry. */
+const OPEN_TINT = 'rgba(52, 199, 89, 0.16)';
+const CLOSED_TINT = 'rgba(255, 59, 48, 0.16)';
 
 export function OpenHoursCard() {
   const theme = useTheme();
@@ -36,13 +45,18 @@ export function OpenHoursCard() {
   }, []);
 
   const accent = status.isOpen ? theme.colors.primary : theme.colors.error;
-  const container = status.isOpen ? theme.colors.primaryContainer : theme.colors.errorContainer;
-  const onContainer = status.isOpen
-    ? theme.colors.onPrimaryContainer
-    : theme.colors.onErrorContainer;
+  const onSurface = theme.colors.onSurface;
 
   return (
-    <Surface style={[styles.surface, { backgroundColor: container }]} elevation={0}>
+    <GlassSurface
+      variant="regular"
+      interactive
+      tintColor={status.isOpen ? OPEN_TINT : CLOSED_TINT}
+      androidElevation={0}
+      androidBackgroundColor={
+        status.isOpen ? theme.colors.primaryContainer : theme.colors.errorContainer
+      }
+      style={styles.surface}>
       <TouchableRipple
         onPress={() => setExpanded((value) => !value)}
         accessibilityRole="button"
@@ -53,18 +67,14 @@ export function OpenHoursCard() {
           <View style={styles.headerRow}>
             <View style={[styles.statusDot, { backgroundColor: accent }]} />
             <View style={styles.headerText}>
-              <Text variant="titleMedium" style={{ color: onContainer }}>
+              <Text variant="titleMedium" style={{ color: onSurface }}>
                 {status.isOpen ? 'Open now' : 'Closed'}
               </Text>
-              <Text variant="bodySmall" style={{ color: onContainer }}>
+              <Text variant="bodySmall" style={{ color: onSurface }}>
                 {status.message.replace(/^(Open now|Closed) · /, '')}
               </Text>
             </View>
-            <MaterialCommunityIcons
-              name={expanded ? 'chevron-up' : 'chevron-down'}
-              size={24}
-              color={onContainer}
-            />
+            <AppIcon name={expanded ? 'chevronUp' : 'chevronDown'} size={22} color={onSurface} />
           </View>
 
           {expanded ? (
@@ -76,17 +86,13 @@ export function OpenHoursCard() {
                   <View key={day} style={styles.weekRow}>
                     <Text
                       variant="bodyMedium"
-                      style={[
-                        styles.dayLabel,
-                        { color: onContainer },
-                        isToday && styles.todayLabel,
-                      ]}>
+                      style={[styles.dayLabel, { color: onSurface }, isToday && styles.todayLabel]}>
                       {DAY_NAMES_SHORT[day]}
                       {isToday ? ' • today' : ''}
                     </Text>
                     <Text
                       variant="bodyMedium"
-                      style={[{ color: onContainer }, isToday && styles.todayLabel]}>
+                      style={[{ color: onSurface }, isToday && styles.todayLabel]}>
                       {formatDayHours(hours)}
                     </Text>
                   </View>
@@ -96,7 +102,7 @@ export function OpenHoursCard() {
           ) : null}
         </View>
       </TouchableRipple>
-    </Surface>
+    </GlassSurface>
   );
 }
 

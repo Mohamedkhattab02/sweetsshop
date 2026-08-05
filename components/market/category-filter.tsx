@@ -8,6 +8,7 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, Text, useTheme } from 'react-native-paper';
 
+import { iconSource } from '@/components/ui/icon-source';
 import { CATEGORIES, type CategoryId } from '@/constants/market';
 
 type Props = {
@@ -53,7 +54,7 @@ export function CategoryFilter({ selected, onToggle, onClear, counts }: Props) {
             <Chip
               key={category.id}
               mode="outlined"
-              icon={isSelected ? undefined : category.icon}
+              icon={isSelected ? undefined : iconSource(category.icon)}
               selected={isSelected}
               showSelectedOverlay
               onPress={() => onToggle(category.id)}

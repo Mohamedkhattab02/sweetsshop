@@ -5,6 +5,8 @@
  * schedule live here as plain data.
  */
 
+import type { IconToken } from '@/constants/icons';
+
 export type CategoryId =
   | 'fruits'
   | 'vegetables'
@@ -18,19 +20,22 @@ export type CategoryId =
 export type Category = {
   id: CategoryId;
   label: string;
-  /** MaterialCommunityIcons name, used for chips and image placeholders. */
-  icon: string;
+  /**
+   * Icon for chips and image placeholders. Carries both platforms' names so
+   * Android gets Material glyphs and iOS gets SF Symbols.
+   */
+  icon: IconToken;
 };
 
 export const CATEGORIES: Category[] = [
-  { id: 'fruits', label: 'Fruits', icon: 'food-apple' },
-  { id: 'vegetables', label: 'Vegetables', icon: 'carrot' },
-  { id: 'dairy', label: 'Dairy', icon: 'cheese' },
-  { id: 'bakery', label: 'Bakery', icon: 'bread-slice' },
-  { id: 'meat', label: 'Meat', icon: 'food-drumstick' },
-  { id: 'seafood', label: 'Seafood', icon: 'fish' },
-  { id: 'beverages', label: 'Beverages', icon: 'bottle-soda' },
-  { id: 'snacks', label: 'Snacks', icon: 'cookie' },
+  { id: 'fruits', label: 'Fruits', icon: { md: 'food-apple', sf: 'leaf.fill' } },
+  { id: 'vegetables', label: 'Vegetables', icon: { md: 'carrot', sf: 'carrot.fill' } },
+  { id: 'dairy', label: 'Dairy', icon: { md: 'cheese', sf: 'drop.fill' } },
+  { id: 'bakery', label: 'Bakery', icon: { md: 'bread-slice', sf: 'birthday.cake.fill' } },
+  { id: 'meat', label: 'Meat', icon: { md: 'food-drumstick', sf: 'fork.knife' } },
+  { id: 'seafood', label: 'Seafood', icon: { md: 'fish', sf: 'fish.fill' } },
+  { id: 'beverages', label: 'Beverages', icon: { md: 'bottle-soda', sf: 'cup.and.saucer.fill' } },
+  { id: 'snacks', label: 'Snacks', icon: { md: 'cookie', sf: 'popcorn.fill' } },
 ];
 
 export const CATEGORY_BY_ID: Record<CategoryId, Category> = CATEGORIES.reduce(

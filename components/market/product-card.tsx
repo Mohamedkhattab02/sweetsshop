@@ -5,12 +5,13 @@
  * to load, so uploaded products and offline runs still render cleanly.
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Badge, Card, IconButton, Text, useTheme } from 'react-native-paper';
 
+import { AppIcon } from '@/components/ui/app-icon';
+import { iconSource } from '@/components/ui/icon-source';
 import { formatPrice, getCategory } from '@/constants/market';
 import { useCart } from '@/store/cart';
 import type { Product } from '@/store/products';
@@ -29,15 +30,17 @@ export function ProductCard({ product, onPress }: Props) {
   const inCart = getQuantity(product.id);
 
   return (
-    <Card mode="outlined" style={styles.card} onPress={onPress}>
+    // iOS groups content into soft-cornered, borderless cards; Material 3 uses
+    // an outline. Same component, each platform's shape language.
+    <Card mode={Platform.OS === 'ios' ? 'elevated' : 'outlined'} style={styles.card} onPress={onPress}>
       <View style={styles.imageWrapper}>
         {showPlaceholder ? (
           <View
             style={[styles.placeholder, { backgroundColor: theme.colors.secondaryContainer }]}
             accessible
             accessibilityLabel={`${category.label} product image placeholder`}>
-            <MaterialCommunityIcons
-              name={category.icon as never}
+            <AppIcon
+              name={category.icon}
               size={44}
               color={theme.colors.onSecondaryContainer}
             />
@@ -84,7 +87,7 @@ export function ProductCard({ product, onPress }: Props) {
 
           <View>
             <IconButton
-              icon={inCart > 0 ? 'cart-check' : 'cart-plus'}
+              icon={iconSource(inCart > 0 ? 'cartAdded' : 'cartAdd')}
               mode="contained-tonal"
               size={18}
               style={styles.cartButton}

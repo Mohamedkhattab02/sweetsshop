@@ -9,7 +9,6 @@ import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import {
-  Appbar,
   Button,
   Divider,
   HelperText,
@@ -20,6 +19,8 @@ import {
 } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { iconSource } from '@/components/ui/icon-source';
+import { ScreenHeader, useScreenHeaderInset } from '@/components/ui/screen-header';
 import { formatPrice } from '@/constants/market';
 import { useCart } from '@/store/cart';
 
@@ -31,6 +32,7 @@ export default function CheckoutScreen() {
   const theme = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const headerInset = useScreenHeaderInset();
   const { lines, itemCount, subtotal, isEmpty, placeOrder } = useCart();
 
   const [name, setName] = useState('');
@@ -79,11 +81,8 @@ export default function CheckoutScreen() {
   if (isEmpty && !isNavigatingAway.current) {
     return (
       <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-        <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-          <Appbar.BackAction onPress={() => router.back()} />
-          <Appbar.Content title="Checkout" />
-        </Appbar.Header>
-        <View style={styles.empty}>
+        <ScreenHeader title="Checkout" onBack={() => router.back()} />
+        <View style={[styles.empty, { paddingTop: headerInset }]}>
           <Text variant="titleMedium">There is nothing to order yet.</Text>
           <Button mode="contained-tonal" onPress={() => router.navigate('/')}>
             Browse the market
@@ -95,17 +94,17 @@ export default function CheckoutScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-        <Appbar.BackAction onPress={() => router.back()} accessibilityLabel="Back to the cart" />
-        <Appbar.Content title="Checkout" />
-      </Appbar.Header>
+      <ScreenHeader title="Checkout" onBack={() => router.back()} />
 
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
         <ScrollView
-          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
+          contentContainerStyle={[
+            styles.content,
+            { paddingTop: headerInset + 12, paddingBottom: insets.bottom + 32 },
+          ]}
           keyboardShouldPersistTaps="handled">
           {/* ---------------------------- Summary --------------------------- */}
           <Surface
@@ -146,7 +145,7 @@ export default function CheckoutScreen() {
               textContentType="name"
               maxLength={60}
               error={showError('name')}
-              left={<TextInput.Icon icon="account-outline" />}
+              left={<TextInput.Icon icon={iconSource('person')} />}
             />
             {showError('name') ? (
               <HelperText type="error" visible padding="none">
@@ -167,7 +166,7 @@ export default function CheckoutScreen() {
               maxLength={24}
               placeholder="+1 555 010 9999"
               error={showError('phone')}
-              left={<TextInput.Icon icon="phone-outline" />}
+              left={<TextInput.Icon icon={iconSource('phone')} />}
             />
             <HelperText type={showError('phone') ? 'error' : 'info'} visible padding="none">
               {showError('phone') ? errors.phone : 'We call this number to confirm your order.'}
@@ -185,7 +184,7 @@ export default function CheckoutScreen() {
               numberOfLines={3}
               maxLength={200}
               style={styles.multiline}
-              left={<TextInput.Icon icon="map-marker-outline" />}
+              left={<TextInput.Icon icon={iconSource('address')} />}
             />
             <HelperText type="info" visible padding="none">
               {address.trim().length > 0
@@ -196,7 +195,7 @@ export default function CheckoutScreen() {
 
           <Button
             mode="contained"
-            icon="check-circle-outline"
+            icon={iconSource('checkCircle')}
             onPress={handlePlaceOrder}
             disabled={submitted && !isValid}
             contentStyle={styles.placeContent}

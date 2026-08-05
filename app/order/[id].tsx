@@ -5,12 +5,15 @@
  * order out of the order history by id.
  */
 
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Appbar, Button, Divider, Surface, Text, useTheme } from 'react-native-paper';
+import { Button, Divider, Surface, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppIcon } from '@/components/ui/app-icon';
+import { iconSource } from '@/components/ui/icon-source';
+import { ScreenHeader, useScreenHeaderInset } from '@/components/ui/screen-header';
+import type { IconName } from '@/constants/icons';
 import { formatPrice, getMarketStatus } from '@/constants/market';
 import { useCart } from '@/store/cart';
 
@@ -18,6 +21,7 @@ export default function OrderConfirmationScreen() {
   const theme = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const headerInset = useScreenHeaderInset();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getOrderById } = useCart();
 
@@ -27,11 +31,11 @@ export default function OrderConfirmationScreen() {
   if (!order) {
     return (
       <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-        <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-          <Appbar.Content title="Order" />
-          <Appbar.Action icon="close" accessibilityLabel="Close" onPress={() => router.navigate('/')} />
-        </Appbar.Header>
-        <View style={styles.missing}>
+        <ScreenHeader
+          title="Order"
+          actions={[{ icon: 'close', label: 'Close', onPress: () => router.navigate('/') }]}
+        />
+        <View style={[styles.missing, { paddingTop: headerInset }]}>
           <Text variant="titleMedium">We could not find that order.</Text>
           <Button mode="contained-tonal" onPress={() => router.navigate('/')}>
             Back to the market
@@ -46,23 +50,25 @@ export default function OrderConfirmationScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-        <Appbar.Content title="Order confirmed" />
-        <Appbar.Action
-          icon="close"
-          accessibilityLabel="Close and return to the market"
-          onPress={() => router.navigate('/')}
-        />
-      </Appbar.Header>
+      <ScreenHeader
+        title="Order confirmed"
+        actions={[
+          {
+            icon: 'close',
+            label: 'Close and return to the market',
+            onPress: () => router.navigate('/'),
+          },
+        ]}
+      />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: headerInset + 16, paddingBottom: insets.bottom + 32 },
+        ]}>
         <View style={styles.hero}>
           <View style={[styles.checkCircle, { backgroundColor: theme.colors.primaryContainer }]}>
-            <MaterialCommunityIcons
-              name="check"
-              size={48}
-              color={theme.colors.onPrimaryContainer}
-            />
+            <AppIcon name="check" size={48} color={theme.colors.onPrimaryContainer} />
           </View>
           <Text variant="headlineSmall" style={styles.centered}>
             Thanks, {customer.name.split(' ')[0]}!
@@ -115,15 +121,15 @@ export default function OrderConfirmationScreen() {
             {customer.address ? 'Delivery details' : 'Collection details'}
           </Text>
 
-          <DetailRow icon="account-outline" label="Name" value={customer.name} />
-          <DetailRow icon="phone-outline" label="Phone" value={customer.phone} />
+          <DetailRow icon="person" label="Name" value={customer.name} />
+          <DetailRow icon="phone" label="Phone" value={customer.phone} />
           <DetailRow
-            icon="map-marker-outline"
+            icon="address"
             label={customer.address ? 'Address' : 'Collection'}
             value={customer.address ?? 'Collect at Green Lane Market'}
           />
           <DetailRow
-            icon="clock-outline"
+            icon="clock"
             label="Placed"
             value={placedAt.toLocaleString(undefined, {
               dateStyle: 'medium',
@@ -134,7 +140,7 @@ export default function OrderConfirmationScreen() {
 
         <Button
           mode="contained"
-          icon="storefront-outline"
+          icon={iconSource('store')}
           onPress={() => router.navigate('/')}
           contentStyle={styles.ctaContent}
           style={styles.cta}>
@@ -145,12 +151,12 @@ export default function OrderConfirmationScreen() {
   );
 }
 
-function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+function DetailRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
   const theme = useTheme();
   return (
     <View style={styles.detailRow}>
-      <MaterialCommunityIcons
-        name={icon as never}
+      <AppIcon
+        name={icon}
         size={20}
         color={theme.colors.onSurfaceVariant}
         style={styles.detailIcon}

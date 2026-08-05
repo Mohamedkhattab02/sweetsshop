@@ -1,20 +1,25 @@
 /**
  * Main page — the market itself.
  *
- * Top to bottom: the Material 3 top app bar, the opening-hours banner, the
- * multi-select category filter, and the product grid for whatever categories
- * are currently selected.
+ * Top to bottom: the navigation bar, the opening-hours banner, the multi-select
+ * category filter, and the product grid for whatever categories are selected.
+ *
+ * On iOS the header is a floating Liquid Glass bar, so the grid scrolls
+ * underneath it and the list is offset by `useScreenHeaderInset()`. On Android
+ * the Material top app bar is opaque and in flow, and that inset is 0.
  */
 
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { AnimatedFAB, Appbar, Badge, Button, Text, useTheme } from 'react-native-paper';
+import { AnimatedFAB, Button, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMemo, useState } from 'react';
 
 import { CategoryFilter } from '@/components/market/category-filter';
 import { OpenHoursCard } from '@/components/market/open-hours-card';
 import { ProductCard } from '@/components/market/product-card';
+import { iconSource } from '@/components/ui/icon-source';
+import { ScreenHeader, useScreenHeaderInset } from '@/components/ui/screen-header';
 import { useCart } from '@/store/cart';
 import { useProducts, type Product } from '@/store/products';
 
@@ -27,6 +32,7 @@ export default function MarketScreen() {
   const theme = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const headerInset = useScreenHeaderInset(true);
   const [fabExtended, setFabExtended] = useState(true);
   const { itemCount } = useCart();
 
@@ -49,35 +55,28 @@ export default function MarketScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated={false} style={{ backgroundColor: theme.colors.background }}>
-        <Appbar.Content title="Green Lane Market" />
-        <View>
-          <Appbar.Action
-            icon={itemCount > 0 ? 'cart' : 'cart-outline'}
-            accessibilityLabel={
-              itemCount > 0 ? `Open the cart, ${itemCount} items` : 'Open the cart, empty'
-            }
-            onPress={() => router.navigate('/cart')}
-          />
-          {itemCount > 0 ? (
-            <Badge
-              size={18}
-              style={[
-                styles.appbarBadge,
-                { backgroundColor: theme.colors.error, color: theme.colors.onError },
-              ]}>
-              {itemCount}
-            </Badge>
-          ) : null}
-        </View>
-      </Appbar.Header>
+      <ScreenHeader
+        title="Green Lane Market"
+        large
+        actions={[
+          {
+            icon: itemCount > 0 ? 'cartFilled' : 'cart',
+            label: itemCount > 0 ? `Open the cart, ${itemCount} items` : 'Open the cart, empty',
+            onPress: () => router.navigate('/cart'),
+            badge: itemCount,
+          },
+        ]}
+      />
 
       <FlatList
         data={gridData}
         keyExtractor={(item, index) => (item === FILLER ? `filler-${index}` : item.id)}
         numColumns={2}
         columnWrapperStyle={styles.column}
-        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + 96 }]}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingTop: headerInset + 8, paddingBottom: insets.bottom + 96 },
+        ]}
         showsVerticalScrollIndicator={false}
         // Collapse the FAB while scrolling so it never hides a product.
         onScroll={({ nativeEvent }) => setFabExtended(nativeEvent.contentOffset.y <= 8)}
@@ -134,7 +133,7 @@ export default function MarketScreen() {
       />
 
       <AnimatedFAB
-        icon="plus"
+        icon={iconSource('plus')}
         label="Add product"
         extended={fabExtended}
         onPress={() => router.navigate('/add')}
@@ -190,10 +189,5 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 16,
-  },
-  appbarBadge: {
-    position: 'absolute',
-    top: 4,
-    right: 2,
   },
 });
