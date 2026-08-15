@@ -20,7 +20,7 @@ export type CartLine = {
 export type Customer = {
   name: string;
   phone: string;
-  /** Optional — a customer can collect the order at the market instead. */
+  /** Optional — a customer can collect the order at the Nour Sweets counter. */
   address?: string;
 };
 
@@ -139,6 +139,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const addToCart = useCallback((product: Product, quantity = 1) => {
+    if (!product.available || product.stockQuantity <= 0) return;
     dispatch({ type: 'add', product, quantity });
   }, []);
 

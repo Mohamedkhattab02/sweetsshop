@@ -38,7 +38,7 @@ export default function OrderConfirmationScreen() {
         <View style={[styles.missing, { paddingTop: headerInset }]}>
           <Text variant="titleMedium">We could not find that order.</Text>
           <Button mode="contained-tonal" onPress={() => router.navigate('/')}>
-            Back to the market
+            Back to the menu
           </Button>
         </View>
       </View>
@@ -55,7 +55,7 @@ export default function OrderConfirmationScreen() {
         actions={[
           {
             icon: 'close',
-            label: 'Close and return to the market',
+            label: 'Close and return to the menu',
             onPress: () => router.navigate('/'),
           },
         ]}
@@ -77,8 +77,8 @@ export default function OrderConfirmationScreen() {
             variant="bodyMedium"
             style={[styles.centered, { color: theme.colors.onSurfaceVariant }]}>
             {status.isOpen
-              ? 'Your order is with the market now. We will call to confirm it shortly.'
-              : `The market is closed right now, so we will start on your order when it reopens. ${status.message.replace('Closed · ', '')}.`}
+              ? 'Your sweets order is with our kitchen. We will call to confirm it shortly.'
+              : `The shop is closed right now, so we will start your order when it reopens. ${status.message.replace('Closed · ', '')}.`}
           </Text>
           <Surface
             elevation={0}
@@ -126,7 +126,7 @@ export default function OrderConfirmationScreen() {
           <DetailRow
             icon="address"
             label={customer.address ? 'Address' : 'Collection'}
-            value={customer.address ?? 'Collect at Green Lane Market'}
+            value={customer.address ?? 'Collect at Nour Sweets'}
           />
           <DetailRow
             icon="clock"
@@ -144,7 +144,7 @@ export default function OrderConfirmationScreen() {
           onPress={() => router.navigate('/')}
           contentStyle={styles.ctaContent}
           style={styles.cta}>
-          Back to the market
+          Back to the menu
         </Button>
       </ScrollView>
     </View>

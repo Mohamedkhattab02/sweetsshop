@@ -1,10 +1,9 @@
 /**
- * In-memory product store.
+ * In-memory catalog for Nour Sweets.
  *
- * This is a sample app, so there is no database or network layer: products live
- * in React state for the lifetime of the session. Everything the screens need
- * (the catalogue, the category filter, adding a product) is exposed through a
- * single context so the two tabs stay in sync.
+ * The sample app intentionally keeps the catalog local, but the shape mirrors
+ * what a production sweets shop API would return: sell-by unit, pack weight,
+ * stock availability, and a customer-facing description all live together.
  */
 
 import { createContext, useCallback, useContext, useMemo, useReducer, type ReactNode } from 'react';
@@ -17,12 +16,18 @@ export type Product = {
   id: string;
   name: string;
   category: CategoryId;
-  /** Price in the market's currency, per `unit`. */
+  /** Price in the shop's currency, per `unit`. */
   price: number;
-  /** Remote URL for seeded products, or a local `file://` URI for uploads. */
+  /** Remote URL for seeded products, or a local URI for uploads. */
   image: string;
   unit: Unit;
+  /** Helpful customer-facing pack or serving detail, e.g. "500 g box". */
+  weight?: string;
   description?: string;
+  /** Whether this item can currently be added to a new order. */
+  available: boolean;
+  /** Current stock expressed in the product's sell-by unit. */
+  stockQuantity: number;
   /** Products added during this session are badged as "New" in the list. */
   isNew: boolean;
 };
@@ -33,40 +38,268 @@ export type NewProductInput = {
   price: number;
   image: string;
   unit?: Unit;
+  weight?: string;
   description?: string;
+  available?: boolean;
+  stockQuantity?: number;
 };
 
-const img = (id: string) => `https://images.unsplash.com/${id}?w=800&q=80&auto=format&fit=crop`;
+const inStock = (stockQuantity: number) => ({ available: true, stockQuantity });
 
 const SEED_PRODUCTS: Product[] = [
-  // Fruits
-  { id: 'p-apples', name: 'Red Apples', category: 'fruits', price: 3.4, unit: 'kg', isNew: false, image: img('photo-1560806887-1e4cd0b6cbd6'), description: 'Crisp and sweet, picked this week from local orchards.' },
-  { id: 'p-bananas', name: 'Bananas', category: 'fruits', price: 1.9, unit: 'kg', isNew: false, image: img('photo-1571771894821-ce9b6c11b08e'), description: 'Fairtrade bananas, sold by the bunch or by weight.' },
-  { id: 'p-watermelon', name: 'Watermelon', category: 'fruits', price: 5.5, unit: 'each', isNew: false, image: img('photo-1587049352846-4a222e784d38'), description: 'Seedless summer watermelon, roughly 4 kg each.' },
-  { id: 'p-mangoes', name: 'Mangoes', category: 'fruits', price: 4.75, unit: 'kg', isNew: false, image: img('photo-1601493700631-2b16ec4b4716'), description: 'Ripe Ataulfo mangoes, ready to eat.' },
-  { id: 'p-tropical-mix', name: 'Tropical Fruit Mix', category: 'fruits', price: 8.9, unit: 'kg', isNew: false, image: img('photo-1610832958506-aa56368176cf'), description: 'Papaya, kiwi, citrus and avocado in one selection box.' },
-
-  // Vegetables
-  { id: 'p-tomatoes', name: 'Vine Tomatoes', category: 'vegetables', price: 2.95, unit: 'kg', isNew: false, image: img('photo-1592924357228-91a4daadcfea'), description: 'Still on the vine, grown in the greenhouse next door.' },
-  { id: 'p-carrots', name: 'Bunched Carrots', category: 'vegetables', price: 2.2, unit: 'bunch', isNew: false, image: img('photo-1598170845058-32b9d6a5da37'), description: 'Sweet young carrots with the tops left on.' },
-  { id: 'p-veg-box', name: 'Seasonal Vegetable Box', category: 'vegetables', price: 14.0, unit: 'each', isNew: false, image: img('photo-1518843875459-f738682238a6'), description: "A mixed box of whatever's best this week." },
-
-  // Dairy
-  { id: 'p-milk', name: 'Whole Milk', category: 'dairy', price: 1.65, unit: 'each', isNew: false, image: img('photo-1550583724-b2692b85b150'), description: 'Non-homogenised whole milk in a returnable 1 L bottle.' },
-  { id: 'p-cheese', name: 'Aged Farmhouse Cheese', category: 'dairy', price: 22.0, unit: 'kg', isNew: false, image: img('photo-1486297678162-eb2a19b0a32d'), description: 'Matured for 12 months, cut to order from the wheel.' },
-
-  // Bakery
-  { id: 'p-sourdough', name: 'Sourdough Loaf', category: 'bakery', price: 4.2, unit: 'each', isNew: false, image: img('photo-1509440159596-0249088772ff'), description: 'Baked each morning with a 24-hour slow ferment.' },
-  { id: 'p-pasta', name: 'Fresh Egg Pasta', category: 'bakery', price: 6.3, unit: 'kg', isNew: false, image: img('photo-1447279506476-3faec8071eee'), description: 'Rolled and cut by hand at the counter every day.' },
-
-  // Meat & seafood
-  { id: 'p-meat-box', name: "Butcher's Mixed Cuts", category: 'meat', price: 18.5, unit: 'kg', isNew: false, image: img('photo-1607623814075-e51df1bdc82f'), description: 'A butcher-selected mix of steak, mince and sausages.' },
-  { id: 'p-salmon', name: 'Atlantic Salmon Fillet', category: 'seafood', price: 26.0, unit: 'kg', isNew: false, image: img('photo-1519708227418-c8fd9a32b7a2'), description: 'Skin-on fillets, filleted fresh at the fish counter.' },
-
-  // Beverages & snacks
-  { id: 'p-coolers', name: 'Citrus Coolers', category: 'beverages', price: 3.8, unit: 'each', isNew: false, image: img('photo-1544145945-f90425340c7e'), description: 'Chilled lime and grapefruit pressés, no added sugar.' },
-  { id: 'p-cookies', name: 'Chocolate Chip Cookies', category: 'snacks', price: 5.25, unit: 'each', isNew: false, image: img('photo-1558961363-fa8fdf82db35'), description: 'A bag of six, still soft in the middle.' },
-  { id: 'p-fruit-bowl', name: 'Fruit & Chocolate Bowl', category: 'snacks', price: 7.4, unit: 'each', isNew: false, image: img('photo-1490474418585-ba9bad8fd0ea'), description: 'Ready-to-eat fruit bowl with dark chocolate on the side.' },
+  {
+    id: 'p-knafeh-nabulsiya',
+    name: 'Nabulsi Knafeh',
+    category: 'knafeh',
+    price: 68,
+    unit: 'each',
+    weight: '500 g tray · serves 4–6',
+    image: 'https://ca-times.brightspotcdn.com/dims4/default/49d4602/2147483647/strip/true/crop/3583x2239%2B0%2B75/resize/1200x750%21/quality/75/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fc6%2Fd2%2F53e3dd554c00a6dfdc06d6de3211%2F557139-fo-0618-palestinian-mrt-023.jpg',
+    description: 'Golden kataifi, warm Nabulsi cheese, orange blossom syrup and roasted pistachios.',
+    ...inStock(12),
+    isNew: false,
+  },
+  {
+    id: 'p-knafeh-cream',
+    name: 'Cream Knafeh Cups',
+    category: 'knafeh',
+    price: 42,
+    unit: 'each',
+    weight: '4 cups · 320 g',
+    image: 'https://www.ashefaa.com/upload/food/ashefaa1560445627959.jpg',
+    description: 'Individual crispy kunafa nests filled with ashta cream and finished with pistachio.',
+    ...inStock(18),
+    isNew: true,
+  },
+  {
+    id: 'p-baklava-pistachio',
+    name: 'Pistachio Baklava',
+    category: 'baklava',
+    price: 88,
+    unit: 'kg',
+    weight: 'Sold by weight · 1 kg box',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/F%C4%B1st%C4%B1kl%C4%B1_Baklava.jpg/1280px-F%C4%B1st%C4%B1kl%C4%B1_Baklava.jpg',
+    description: 'Delicate filo layered with premium Aleppo pistachios and a light rose-scented syrup.',
+    ...inStock(9),
+    isNew: false,
+  },
+  {
+    id: 'p-baklava-assortment',
+    name: 'Baklava Assortment',
+    category: 'baklava',
+    price: 72,
+    unit: 'each',
+    weight: '500 g gift box · 20 pieces',
+    image: 'https://www.afamiabakery.com/cdn/shop/files/20231128-003701.jpg?v=1742482795&width=1946',
+    description: 'A generous mix of pistachio fingers, walnut rolls and cashew diamonds for sharing.',
+    ...inStock(16),
+    isNew: false,
+  },
+  {
+    id: 'p-mabroumeh-pistachio',
+    name: 'Mabroumeh Pistachio',
+    category: 'baklava',
+    price: 92,
+    unit: 'each',
+    weight: '500 g box · 12 rolls',
+    image: 'https://thebaklava.se/cdn/shop/files/IMG_2856.jpg?v=1717958161&width=3840',
+    description: 'Hand-rolled kunafa strands wrapped around Aleppo pistachios, finished with ghee and syrup.',
+    ...inStock(8),
+    isNew: true,
+  },
+  {
+    id: 'p-maamoul-date',
+    name: 'Date Maamoul',
+    category: 'maamoul',
+    price: 54,
+    unit: 'each',
+    weight: '400 g box · 16 pieces',
+    image: 'https://feelgoodfoodie.net/wp-content/uploads/2023/03/Maamoul-23.jpg',
+    description: 'Buttery semolina shortbread filled with slow-cooked Medjool dates and mahlab.',
+    ...inStock(20),
+    isNew: false,
+  },
+  {
+    id: 'p-maamoul-pistachio',
+    name: 'Pistachio Maamoul',
+    category: 'maamoul',
+    price: 64,
+    unit: 'each',
+    weight: '400 g box · 16 pieces',
+    image: 'https://www.cookinwithmima.com/wp-content/uploads/2025/02/pistachio-maamoul.jpg',
+    description: 'Tender, lightly spiced maamoul with a fragrant pistachio and sugar filling.',
+    ...inStock(14),
+    isNew: true,
+  },
+  {
+    id: 'p-warbat-ashta',
+    name: 'Warbat Bil Ashta',
+    category: 'warbat',
+    price: 46,
+    unit: 'each',
+    weight: '6 pieces · 300 g',
+    image: 'https://falasteenifoodie.com/wp-content/uploads/2025/03/Warbat-Bil-Ashta.jpg',
+    description: 'Crisp filo parcels filled with ashta, soaked in orange blossom syrup and topped with pistachio.',
+    ...inStock(11),
+    isNew: false,
+  },
+  {
+    id: 'p-qatayef-walnut',
+    name: 'Walnut Qatayef',
+    category: 'qatayef',
+    price: 48,
+    unit: 'each',
+    weight: '8 pieces · 360 g',
+    image: 'https://thenational-the-national-prod.cdn.arcpublishing.com/resizer/v2/RHWRLQTFXD2IKU4FEZVBW7TVNI.jpg?auth=39d8b21ee15d56201f771e5f0d606851e04935eeae12ec53bd9a45f62408b6f0&height=542&smart=true&width=800',
+    description: 'Soft folded pancakes filled with toasted walnuts, cinnamon and a touch of blossom water.',
+    ...inStock(13),
+    isNew: false,
+  },
+  {
+    id: 'p-qatayef-cheese',
+    name: 'Cheese Qatayef',
+    category: 'qatayef',
+    price: 52,
+    unit: 'each',
+    weight: '8 pieces · 360 g',
+    image: 'https://mission-food.com/wp-content/uploads/2011/07/Qatayef-Asafiri-Atayef-bil-Ashta-10.jpg',
+    description: 'Golden-baked qatayef filled with sweet cheese and served with a small bottle of syrup.',
+    available: false,
+    stockQuantity: 0,
+    isNew: true,
+  },
+  {
+    id: 'p-halawet-el-jibn',
+    name: 'Halawet El Jibn',
+    category: 'cheese-desserts',
+    price: 58,
+    unit: 'each',
+    weight: '500 g tray · serves 4',
+    image: 'https://www.wmadaat.com/upload/06-2021/article/60d82dc459998.jpg',
+    description: 'Soft cheese rolls filled with ashta, scented with rose water and crowned with pistachio.',
+    ...inStock(10),
+    isNew: false,
+  },
+  {
+    id: 'p-basima',
+    name: 'Coconut Basima',
+    category: 'traditional',
+    price: 44,
+    unit: 'each',
+    weight: '450 g tray · serves 6',
+    image: 'https://www.cookinwithmima.com/wp-content/uploads/2019/05/Namoura-3.jpg',
+    description: 'Moist coconut semolina cake baked until golden and soaked in a gentle vanilla syrup.',
+    ...inStock(15),
+    isNew: false,
+  },
+  {
+    id: 'p-znoud-el-sit',
+    name: 'Znoud El Sit',
+    category: 'traditional',
+    price: 48,
+    unit: 'each',
+    weight: '6 rolls · 300 g',
+    image: 'https://www.hungrypaprikas.com/wp-content/uploads/2021/06/Znoud-El-Sit-3-683x1024.jpg',
+    description: 'Crisp phyllo rolls filled with ashta, finished with rose syrup and crushed pistachios.',
+    ...inStock(12),
+    isNew: true,
+  },
+  {
+    id: 'p-umm-ali',
+    name: 'Umm Ali',
+    category: 'puddings',
+    price: 42,
+    unit: 'each',
+    weight: '500 g baking dish · serves 4',
+    image: 'https://amiraspantry.com/wp-content/uploads/2023/02/om-ali-rc-300x300.jpeg',
+    description: 'Warm Egyptian puff pastry pudding with sweet milk, cream, raisins, coconut and nuts.',
+    ...inStock(9),
+    isNew: false,
+  },
+  {
+    id: 'p-mafroukeh',
+    name: 'Pistachio Mafroukeh',
+    category: 'puddings',
+    price: 62,
+    unit: 'each',
+    weight: '4 glass cups · 400 g',
+    image: 'https://images.arla.com/recordid/48252504-D24E-4E58-85C70D20AA52B097/mafroukeh.jpg?format=webp&height=938&mode=crop&width=750',
+    description: 'A Levantine pistachio and semolina sweet layered with ashta cream and orange blossom syrup.',
+    ...inStock(10),
+    isNew: false,
+  },
+  {
+    id: 'p-barazek',
+    name: 'Damascus Barazek',
+    category: 'cookies',
+    price: 46,
+    unit: 'each',
+    weight: '350 g box · 18 cookies',
+    image: 'https://www.edarabia.com/ar/wp-content/uploads/2017/09/how-to-make-pistachio-sesame-cookies-barazek-01.jpg',
+    description: 'Thin, crisp Syrian cookies covered in toasted sesame and dotted with pistachios.',
+    ...inStock(18),
+    isNew: false,
+  },
+  {
+    id: 'p-ghraybeh',
+    name: 'Lebanese Ghraybeh',
+    category: 'cookies',
+    price: 44,
+    unit: 'each',
+    weight: '350 g box · 16 cookies',
+    image: 'https://www.cookinwithmima.com/wp-content/uploads/2022/04/Easy-Graybeh-Cookies.jpg',
+    description: 'Delicate, melt-in-the-mouth butter cookies finished with a whole pistachio.',
+    ...inStock(17),
+    isNew: false,
+  },
+  {
+    id: 'p-rose-lokum',
+    name: 'Rose & Pistachio Lokum',
+    category: 'candies',
+    price: 58,
+    unit: 'each',
+    weight: '400 g box',
+    image: 'https://www.themediterraneandish.com/wp-content/uploads/2022/11/turkish-delight-FINAL-36.jpg',
+    description: 'Soft rosewater lokum with pistachios, dusted lightly for a fragrant coffee-time bite.',
+    ...inStock(14),
+    isNew: true,
+  },
+  {
+    id: 'p-awameh',
+    name: 'Awameh',
+    category: 'traditional',
+    price: 40,
+    unit: 'each',
+    weight: '400 g box · serves 4',
+    image: 'https://hadiaslebanesecuisine.com/blog/wp-content/uploads/2024/10/balls.jpg',
+    description: 'Golden Lebanese doughnut balls, twice-fried for crunch and glazed with blossom syrup.',
+    ...inStock(11),
+    isNew: false,
+  },
+  {
+    id: 'p-mixed-gift-box',
+    name: 'Nour Celebration Box',
+    category: 'gift-boxes',
+    price: 145,
+    unit: 'each',
+    weight: '1.2 kg · 36 assorted pieces',
+    image: 'https://www.afamiabakery.com/cdn/shop/files/20231128-003952.jpg?v=1701136027&width=1946',
+    description: 'Our signature gift box with baklava, maamoul, warbat and seasonal bites, ribbon ready.',
+    ...inStock(7),
+    isNew: false,
+  },
+  {
+    id: 'p-arabic-coffee',
+    name: 'Cardamom Arabic Coffee',
+    category: 'coffee-tea',
+    price: 38,
+    unit: 'each',
+    weight: '250 g pouch',
+    image: 'https://jumanah.co.uk/cdn/shop/products/Gahwa-2-B_1200x1200.jpg?v=1679305523',
+    description: 'Lightly roasted coffee with cardamom, blended to pair with every box of sweets.',
+    ...inStock(24),
+    isNew: false,
+  },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -86,9 +319,7 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'add-product':
-      // Newest first, so an upload is immediately visible at the top.
       return { ...state, products: [action.product, ...state.products] };
-
     case 'toggle-category': {
       const isSelected = state.selectedCategories.includes(action.category);
       return {
@@ -98,7 +329,6 @@ function reducer(state: State, action: Action): State {
           : [...state.selectedCategories, action.category],
       };
     }
-
     case 'clear-categories':
       return { ...state, selectedCategories: [] };
   }
@@ -109,9 +339,7 @@ function reducer(state: State, action: Action): State {
 /* -------------------------------------------------------------------------- */
 
 type ProductsContextValue = {
-  /** Every product in the market. */
   products: Product[];
-  /** Products matching the current category selection. */
   visibleProducts: Product[];
   selectedCategories: CategoryId[];
   isCategorySelected: (category: CategoryId) => boolean;
@@ -119,12 +347,10 @@ type ProductsContextValue = {
   clearCategories: () => void;
   addProduct: (input: NewProductInput) => Product;
   getProductById: (id: string) => Product | undefined;
-  /** How many products sit in a category, for the filter chip counts. */
   countByCategory: Record<CategoryId, number>;
 };
 
 const ProductsContext = createContext<ProductsContextValue | null>(null);
-
 let nextId = 0;
 
 export function ProductsProvider({ children }: { children: ReactNode }) {
@@ -142,7 +368,10 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       price: input.price,
       image: input.image,
       unit: input.unit ?? 'each',
+      weight: input.weight?.trim() || undefined,
       description: input.description?.trim() || undefined,
+      available: input.available ?? true,
+      stockQuantity: input.stockQuantity ?? 20,
       isNew: true,
     };
     dispatch({ type: 'add-product', product });
@@ -157,19 +386,19 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'clear-categories' });
   }, []);
 
-  // No categories selected means "show everything" rather than "show nothing" —
-  // an empty filter should not empty the market.
   const visibleProducts = useMemo(() => {
     if (state.selectedCategories.length === 0) return state.products;
     return state.products.filter((product) => state.selectedCategories.includes(product.category));
   }, [state.products, state.selectedCategories]);
 
-  const countByCategory = useMemo(() => {
-    return state.products.reduce(
-      (acc, product) => ({ ...acc, [product.category]: (acc[product.category] ?? 0) + 1 }),
-      {} as Record<CategoryId, number>
-    );
-  }, [state.products]);
+  const countByCategory = useMemo(
+    () =>
+      state.products.reduce(
+        (acc, product) => ({ ...acc, [product.category]: (acc[product.category] ?? 0) + 1 }),
+        {} as Record<CategoryId, number>
+      ),
+    [state.products]
+  );
 
   const getProductById = useCallback(
     (id: string) => state.products.find((product) => product.id === id),
@@ -211,8 +440,6 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
 
 export function useProducts(): ProductsContextValue {
   const context = useContext(ProductsContext);
-  if (!context) {
-    throw new Error('useProducts must be used inside a <ProductsProvider>');
-  }
+  if (!context) throw new Error('useProducts must be used inside a <ProductsProvider>');
   return context;
 }

@@ -54,13 +54,13 @@ export default function CartScreen() {
           <Text
             variant="bodyMedium"
             style={[styles.emptyBody, { color: theme.colors.onSurfaceVariant }]}>
-            Browse the market and tap the cart button on any product to add it here.
+            Browse the menu and tap the basket button on any sweet to add it here.
           </Text>
           <Button
             mode="contained"
             icon={iconSource('store')}
             onPress={() => router.navigate('/')}>
-            Browse the market
+            Browse the menu
           </Button>
         </View>
       ) : (
@@ -102,7 +102,7 @@ export default function CartScreen() {
                 <Text
                   variant="bodySmall"
                   style={[styles.noticeText, { color: theme.colors.onSurfaceVariant }]}>
-                  {`The market is closed right now — your order will be prepared when it reopens. ${status.message.replace('Closed · ', '')}.`}
+                  {`The shop is closed right now — your sweets will be prepared when it reopens. ${status.message.replace('Closed · ', '')}.`}
                 </Text>
               </View>
             ) : null}

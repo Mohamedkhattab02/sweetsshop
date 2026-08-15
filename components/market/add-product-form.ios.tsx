@@ -72,7 +72,7 @@ export function AddProductForm() {
         options,
         cancelButtonIndex: cancelIndex,
         destructiveButtonIndex: form.image ? removeIndex : undefined,
-        title: 'Product photo',
+        title: 'Sweet photo',
       },
       (index) => {
         if (index === 0) form.takePhoto();
@@ -85,9 +85,9 @@ export function AddProductForm() {
   const handleSubmit = () => {
     const product = form.submit();
     if (!product) return;
-    Alert.alert('Added to the market', `"${product.name}" is now listed.`, [
+    Alert.alert('Added to the menu', `"${product.name}" is now listed.`, [
       { text: 'Add another', style: 'cancel' },
-      { text: 'View market', onPress: () => router.navigate('/') },
+      { text: 'View menu', onPress: () => router.navigate('/') },
     ]);
   };
 
@@ -111,7 +111,7 @@ export function AddProductForm() {
           <Pressable
             onPress={presentPhotoOptions}
             accessibilityRole="button"
-            accessibilityLabel={form.image ? 'Change the product photo' : 'Add a product photo'}
+            accessibilityLabel={form.image ? 'Change the sweet photo' : 'Add a sweet photo'}
             style={({ pressed }) => [styles.photoWell, pressed && styles.photoWellPressed]}>
             {form.image ? (
               <Image source={{ uri: form.image }} style={styles.photo} contentFit="cover" />
@@ -144,7 +144,7 @@ export function AddProductForm() {
               maxLength={NAME_MAX_LENGTH}
               style={styles.fieldInput}
               returnKeyType="next"
-              accessibilityLabel="Product name"
+              accessibilityLabel="Sweet name"
             />
           </FormRow>
 
@@ -167,12 +167,12 @@ export function AddProductForm() {
 
           <FormSeparator />
 
-          <FormRow label="Sold per">
+          <FormRow label="Sold as">
             <FormSegmentedControl
               options={UNIT_OPTIONS}
               value={form.unit}
               onChange={form.setUnit}
-              accessibilityLabel="Unit the product is sold by"
+            accessibilityLabel="Unit the sweet is sold by"
             />
           </FormRow>
         </FormSection>
@@ -185,7 +185,7 @@ export function AddProductForm() {
               ? form.errors.category!
               : selectedCategory
                 ? `Listed under ${selectedCategory.label}.`
-                : 'Choose where this product appears in the market.'
+                : 'Choose where this sweet appears on the menu.'
           }
           footerTone={form.showError('category') ? 'error' : 'default'}>
           {CATEGORIES.map((option, index) => (
@@ -221,12 +221,12 @@ export function AddProductForm() {
 
         <View style={styles.actions}>
           <FormButton
-            title="Add to Market"
+            title="Add to Menu"
             onPress={handleSubmit}
             disabled={form.submitted && !form.isValid}
           />
           <Text style={styles.footnote}>
-            Products are kept in memory for this sample app and reset when the app restarts.
+            New sweets are kept in memory for this sample app and reset when the app restarts.
           </Text>
         </View>
       </ScrollView>

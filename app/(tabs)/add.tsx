@@ -1,9 +1,9 @@
 /**
- * Upload a new product.
+ * Add a new sweet to the menu.
  *
  * Name, category, price and image are all required; inline errors appear once
  * the user has tried to submit, and the product is pushed straight into the
- * in-memory store so it shows up on the market page immediately.
+ * in-memory store so it shows up on the menu immediately.
  *
  * The form body is platform-split — Material 3 on Android, an inset-grouped
  * form on iOS — while `useAddProductForm` keeps the rules identical on both.
@@ -21,7 +21,7 @@ export default function AddProductScreen() {
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <ScreenHeader title="Add a product" large />
+      <ScreenHeader title="Add a sweet" large />
       <AddProductForm />
     </View>
   );

@@ -1,41 +1,43 @@
 /**
- * Static market configuration: what the market sells and when it is open.
- *
- * This is a sample app with no backend, so the categories and the opening
- * schedule live here as plain data.
+ * Static shop configuration: what Nour Sweets sells and when the counter is open.
+ * The app has no backend, so the catalog taxonomy and opening schedule live here.
  */
 
 import type { IconToken } from '@/constants/icons';
 
 export type CategoryId =
-  | 'fruits'
-  | 'vegetables'
-  | 'dairy'
-  | 'bakery'
-  | 'meat'
-  | 'seafood'
-  | 'beverages'
-  | 'snacks';
+  | 'knafeh'
+  | 'baklava'
+  | 'maamoul'
+  | 'warbat'
+  | 'qatayef'
+  | 'cheese-desserts'
+  | 'traditional'
+  | 'cookies'
+  | 'puddings'
+  | 'candies'
+  | 'gift-boxes'
+  | 'coffee-tea';
 
 export type Category = {
   id: CategoryId;
   label: string;
-  /**
-   * Icon for chips and image placeholders. Carries both platforms' names so
-   * Android gets Material glyphs and iOS gets SF Symbols.
-   */
   icon: IconToken;
 };
 
 export const CATEGORIES: Category[] = [
-  { id: 'fruits', label: 'Fruits', icon: { md: 'food-apple', sf: 'leaf.fill' } },
-  { id: 'vegetables', label: 'Vegetables', icon: { md: 'carrot', sf: 'carrot.fill' } },
-  { id: 'dairy', label: 'Dairy', icon: { md: 'cheese', sf: 'drop.fill' } },
-  { id: 'bakery', label: 'Bakery', icon: { md: 'bread-slice', sf: 'birthday.cake.fill' } },
-  { id: 'meat', label: 'Meat', icon: { md: 'food-drumstick', sf: 'fork.knife' } },
-  { id: 'seafood', label: 'Seafood', icon: { md: 'fish', sf: 'fish.fill' } },
-  { id: 'beverages', label: 'Beverages', icon: { md: 'bottle-soda', sf: 'cup.and.saucer.fill' } },
-  { id: 'snacks', label: 'Snacks', icon: { md: 'cookie', sf: 'popcorn.fill' } },
+  { id: 'knafeh', label: 'Knafeh', icon: { md: 'cake-variant', sf: 'birthday.cake.fill' } },
+  { id: 'baklava', label: 'Baklava', icon: { md: 'food-croissant', sf: 'square.grid.2x2.fill' } },
+  { id: 'maamoul', label: 'Maamoul', icon: { md: 'cookie', sf: 'circle.grid.2x2.fill' } },
+  { id: 'warbat', label: 'Warbat', icon: { md: 'food-croissant', sf: 'triangle.fill' } },
+  { id: 'qatayef', label: 'Qatayef', icon: { md: 'pan', sf: 'circle.fill' } },
+  { id: 'cheese-desserts', label: 'Cheese desserts', icon: { md: 'cheese', sf: 'circle.lefthalf.filled' } },
+  { id: 'traditional', label: 'Traditional treats', icon: { md: 'food-variant', sf: 'sparkles' } },
+  { id: 'cookies', label: 'Arabic cookies', icon: { md: 'cookie-outline', sf: 'circle.grid.2x2.fill' } },
+  { id: 'puddings', label: 'Creamy desserts', icon: { md: 'cup', sf: 'cup.and.saucer.fill' } },
+  { id: 'candies', label: 'Lokum & candies', icon: { md: 'candy-outline', sf: 'cube.fill' } },
+  { id: 'gift-boxes', label: 'Gift boxes', icon: { md: 'gift-outline', sf: 'gift.fill' } },
+  { id: 'coffee-tea', label: 'Coffee & tea', icon: { md: 'coffee-outline', sf: 'cup.and.saucer.fill' } },
 ];
 
 export const CATEGORY_BY_ID: Record<CategoryId, Category> = CATEGORIES.reduce(
@@ -51,7 +53,6 @@ export function getCategory(id: CategoryId): Category {
 /*                                Opening hours                               */
 /* -------------------------------------------------------------------------- */
 
-/** Minutes since midnight, e.g. `{ open: 8 * 60, close: 20 * 60 }`. */
 export type DayHours = { open: number; close: number } | null;
 
 const hm = (hours: number, minutes = 0) => hours * 60 + minutes;
@@ -59,15 +60,15 @@ const hm = (hours: number, minutes = 0) => hours * 60 + minutes;
 export const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export const DAY_NAMES_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-/** Indexed by `Date.prototype.getDay()` — 0 is Sunday. `null` means closed. */
+/** Indexed by `Date.prototype.getDay()` — 0 is Sunday. */
 export const OPENING_HOURS: DayHours[] = [
-  null, // Sunday — closed
-  { open: hm(8), close: hm(20) }, // Monday
-  { open: hm(8), close: hm(20) }, // Tuesday
-  { open: hm(8), close: hm(20) }, // Wednesday
-  { open: hm(8), close: hm(20) }, // Thursday
-  { open: hm(8), close: hm(22) }, // Friday
-  { open: hm(9), close: hm(22) }, // Saturday
+  { open: hm(10), close: hm(21) },
+  { open: hm(9), close: hm(21) },
+  { open: hm(9), close: hm(21) },
+  { open: hm(9), close: hm(21) },
+  { open: hm(9), close: hm(21) },
+  { open: hm(9), close: hm(23) },
+  { open: hm(10), close: hm(23) },
 ];
 
 export function formatTime(minutesSinceMidnight: number): string {
@@ -86,10 +87,6 @@ export type MarketStatus =
   | { isOpen: true; message: string; closesAt: number }
   | { isOpen: false; message: string; opensAt: number; opensInDays: number };
 
-/**
- * Works out whether the market is open at `now`, plus a human-readable summary
- * of the next transition ("Closes at 8:00 PM" / "Opens Monday at 8:00 AM").
- */
 export function getMarketStatus(now: Date = new Date()): MarketStatus {
   const today = now.getDay();
   const minutesNow = now.getHours() * 60 + now.getMinutes();
@@ -103,15 +100,13 @@ export function getMarketStatus(now: Date = new Date()): MarketStatus {
     };
   }
 
-  // Not open — scan forward (including later today) for the next opening slot.
   for (let offset = 0; offset < 7; offset += 1) {
     const day = (today + offset) % 7;
     const hours = OPENING_HOURS[day];
     if (!hours) continue;
-    if (offset === 0 && minutesNow >= hours.open) continue; // already past today's slot
+    if (offset === 0 && minutesNow >= hours.open) continue;
 
-    const when =
-      offset === 0 ? 'today' : offset === 1 ? 'tomorrow' : `on ${DAY_NAMES[day]}`;
+    const when = offset === 0 ? 'today' : offset === 1 ? 'tomorrow' : `on ${DAY_NAMES[day]}`;
     return {
       isOpen: false,
       message: `Closed · Opens ${when} at ${formatTime(hours.open)}`,
@@ -123,11 +118,7 @@ export function getMarketStatus(now: Date = new Date()): MarketStatus {
   return { isOpen: false, message: 'Closed', opensAt: 0, opensInDays: 0 };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                   Pricing                                  */
-/* -------------------------------------------------------------------------- */
-
-export const CURRENCY_SYMBOL = '$';
+export const CURRENCY_SYMBOL = '₪';
 
 export function formatPrice(price: number): string {
   return `${CURRENCY_SYMBOL}${price.toFixed(2)}`;

@@ -2,7 +2,7 @@
  * Checkout — the order details form.
  *
  * Name and phone number are required; the address is optional, and leaving it
- * blank turns the order into a collection at the market.
+ * blank turns the order into collection at the Nour Sweets counter.
  */
 
 import { useRouter } from 'expo-router';
@@ -85,7 +85,7 @@ export default function CheckoutScreen() {
         <View style={[styles.empty, { paddingTop: headerInset }]}>
           <Text variant="titleMedium">There is nothing to order yet.</Text>
           <Button mode="contained-tonal" onPress={() => router.navigate('/')}>
-            Browse the market
+            Browse the menu
           </Button>
         </View>
       </View>
@@ -164,7 +164,7 @@ export default function CheckoutScreen() {
               autoComplete="tel"
               textContentType="telephoneNumber"
               maxLength={24}
-              placeholder="+1 555 010 9999"
+              placeholder="+972 50 000 0000"
               error={showError('phone')}
               left={<TextInput.Icon icon={iconSource('phone')} />}
             />
@@ -188,8 +188,8 @@ export default function CheckoutScreen() {
             />
             <HelperText type="info" visible padding="none">
               {address.trim().length > 0
-                ? 'We will deliver to this address.'
-                : 'Leave this blank to collect your order at the market.'}
+                ? 'We will deliver your sweets to this address.'
+                : 'Leave this blank to collect your sweets at our counter.'}
             </HelperText>
           </View>
 

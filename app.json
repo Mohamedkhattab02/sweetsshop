@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "market-app",
-    "slug": "market-app",
+    "name": "Nour Sweets",
+    "slug": "nour-sweets",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "marketapp",
+    "scheme": "noursweets",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -30,8 +30,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Green Lane Market uses your photos so you can add a picture to a product you are listing.",
-          "cameraPermission": "Green Lane Market uses the camera so you can photograph a product you are listing."
+          "photosPermission": "Nour Sweets uses your photos so you can add a picture to a sweet on the menu.",
+          "cameraPermission": "Nour Sweets uses the camera so you can photograph a sweet on the menu."
         }
       ],
       [

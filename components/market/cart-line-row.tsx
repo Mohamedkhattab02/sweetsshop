@@ -52,6 +52,11 @@ export function CartLineRow({ line, onChangeQuantity, onRemove, onPress }: Props
           <Text variant="titleSmall" numberOfLines={2}>
             {product.name}
           </Text>
+          {product.weight ? (
+            <Text variant="bodySmall" numberOfLines={1} style={{ color: theme.colors.onSurfaceVariant }}>
+              {product.weight}
+            </Text>
+          ) : null}
           <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
             {`${formatPrice(product.price)} / ${product.unit}`}
           </Text>

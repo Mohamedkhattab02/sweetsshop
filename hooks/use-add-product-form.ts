@@ -14,10 +14,10 @@ import type { CategoryId } from '@/constants/market';
 import { useProducts, type Product, type Unit } from '@/store/products';
 
 export const UNIT_OPTIONS: { value: Unit; label: string }[] = [
-  { value: 'each', label: 'Each' },
+  { value: 'each', label: 'Box / tray' },
   { value: 'kg', label: 'Kg' },
   { value: 'lb', label: 'Lb' },
-  { value: 'bunch', label: 'Bunch' },
+  { value: 'bunch', label: 'Piece set' },
 ];
 
 export const NAME_MAX_LENGTH = 60;
@@ -58,10 +58,10 @@ export function useAddProductForm({ onNotify }: Options = {}) {
 
   const errors = useMemo(
     () => ({
-      name: trimmedName.length < 2 ? 'Enter a product name (at least 2 characters).' : null,
-      category: category === null ? 'Choose the category this product belongs to.' : null,
+      name: trimmedName.length < 2 ? 'Enter a sweet name (at least 2 characters).' : null,
+      category: category === null ? 'Choose the sweet category.' : null,
       price: priceIsValid ? null : 'Enter a price greater than 0.',
-      image: image === null ? 'A product photo is required.' : null,
+      image: image === null ? 'A sweet photo is required.' : null,
     }),
     [trimmedName, category, priceIsValid, image]
   );
@@ -86,7 +86,7 @@ export function useAddProductForm({ onNotify }: Options = {}) {
     if (!cameraPermission?.granted) {
       const response = await requestCameraPermission();
       if (!response.granted) {
-        onNotify?.('Camera permission is needed to take a product photo.');
+        onNotify?.('Camera permission is needed to take a sweet photo.');
         return;
       }
     }

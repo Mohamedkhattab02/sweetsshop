@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMemo, useState } from 'react';
 
 import { CategoryFilter } from '@/components/market/category-filter';
+import { MenuHero } from '@/components/market/menu-hero';
 import { OpenHoursCard } from '@/components/market/open-hours-card';
 import { ProductCard } from '@/components/market/product-card';
 import { iconSource } from '@/components/ui/icon-source';
@@ -56,7 +57,7 @@ export default function MarketScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <ScreenHeader
-        title="Green Lane Market"
+        title="Nour Sweets"
         large
         actions={[
           {
@@ -84,6 +85,9 @@ export default function MarketScreen() {
         ListHeaderComponent={
           <View style={styles.header}>
             <View style={styles.headerPadded}>
+              <MenuHero />
+            </View>
+            <View style={styles.headerPadded}>
               <OpenHoursCard />
             </View>
 
@@ -97,8 +101,8 @@ export default function MarketScreen() {
             <View style={[styles.headerPadded, styles.resultRow]}>
               <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
                 {isFiltered
-                  ? `${visibleProducts.length} of ${products.length} products`
-                  : `${products.length} products in the market`}
+                  ? `${visibleProducts.length} of ${products.length} sweets`
+                  : `${products.length} sweets on today’s menu`}
               </Text>
               {isFiltered ? (
                 <Button compact mode="text" onPress={clearCategories}>
@@ -123,10 +127,10 @@ export default function MarketScreen() {
             <Text
               variant="bodyMedium"
               style={[styles.emptyBody, { color: theme.colors.onSurfaceVariant }]}>
-              Pick different categories, or add the first product yourself.
+              Try another sweet category, or add a new house favorite.
             </Text>
             <Button mode="contained-tonal" onPress={() => router.navigate('/add')}>
-              Add a product
+              Add a sweet
             </Button>
           </View>
         }
@@ -134,10 +138,10 @@ export default function MarketScreen() {
 
       <AnimatedFAB
         icon={iconSource('plus')}
-        label="Add product"
+        label="Add a sweet"
         extended={fabExtended}
         onPress={() => router.navigate('/add')}
-        accessibilityLabel="Add a new product to the market"
+        accessibilityLabel="Add a new sweet to the menu"
         style={[styles.fab, { bottom: insets.bottom + 16 }]}
       />
     </View>

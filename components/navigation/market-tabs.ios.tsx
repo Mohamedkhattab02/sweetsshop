@@ -22,7 +22,7 @@ export function MarketTabs() {
     <NativeTabs tintColor={IOSColors.accent} minimizeBehavior="onScrollDown">
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: 'storefront', selected: 'storefront.fill' }} />
-        <Label>Market</Label>
+        <Label>Menu</Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="add">

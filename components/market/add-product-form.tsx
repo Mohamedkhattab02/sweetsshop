@@ -51,7 +51,7 @@ export function AddProductForm() {
 
   const handleSubmit = () => {
     const product = form.submit();
-    if (product) setSnackbar(`"${product.name}" was added to the market.`);
+    if (product) setSnackbar(`"${product.name}" was added to the menu.`);
   };
 
   return (
@@ -83,7 +83,7 @@ export function AddProductForm() {
               <TouchableRipple
                 onPress={form.pickFromLibrary}
                 accessibilityRole="button"
-                accessibilityLabel="Choose a product photo from your gallery"
+                accessibilityLabel="Choose a sweet photo from your gallery"
                 style={[
                   styles.dropzone,
                   {
@@ -96,7 +96,7 @@ export function AddProductForm() {
                 <View style={styles.dropzoneInner}>
                   <AppIcon name="photoAdd" size={40} color={theme.colors.onSurfaceVariant} />
                   <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                    Tap to choose a photo
+                    Tap to choose a sweet photo
                   </Text>
                 </View>
               </TouchableRipple>
@@ -108,14 +108,14 @@ export function AddProductForm() {
                 icon={iconSource('gallery')}
                 onPress={form.pickFromLibrary}
                 style={styles.flex}>
-                Gallery
+                Photo library
               </Button>
               <Button
                 mode="contained-tonal"
                 icon={iconSource('camera')}
                 onPress={form.takePhoto}
                 style={styles.flex}>
-                Camera
+                Take photo
               </Button>
             </View>
 
@@ -130,10 +130,10 @@ export function AddProductForm() {
           <View style={styles.section}>
             <TextInput
               mode="outlined"
-              label="Product name *"
+              label="Sweet name *"
               value={form.name}
               onChangeText={form.setName}
-              placeholder="e.g. Organic strawberries"
+              placeholder="e.g. Pistachio maamoul"
               maxLength={NAME_MAX_LENGTH}
               error={form.showError('name')}
               left={<TextInput.Icon icon={iconSource('tag')} />}
@@ -147,7 +147,7 @@ export function AddProductForm() {
 
           {/* ----------------------------- Category --------------------------- */}
           <View style={styles.section}>
-            <Text variant="titleMedium">Category *</Text>
+            <Text variant="titleMedium">Sweet category *</Text>
             <View style={styles.chipWrap}>
               {CATEGORIES.map((option) => {
                 const isSelected = form.category === option.id;
@@ -175,7 +175,7 @@ export function AddProductForm() {
           <View style={styles.section}>
             <TextInput
               mode="outlined"
-              label="Price *"
+              label="Price per unit *"
               value={form.price}
               onChangeText={form.setPrice}
               keyboardType="decimal-pad"
@@ -190,7 +190,7 @@ export function AddProductForm() {
             ) : null}
 
             <Text variant="labelLarge" style={styles.unitLabel}>
-              Sold per
+              Sold as
             </Text>
             <SegmentedButtons
               value={form.unit}
@@ -221,13 +221,13 @@ export function AddProductForm() {
             disabled={form.submitted && !form.isValid}
             contentStyle={styles.submitContent}
             style={styles.submit}>
-            Add to market
+            Add to menu
           </Button>
 
           <Text
             variant="bodySmall"
             style={[styles.footnote, { color: theme.colors.onSurfaceVariant }]}>
-            Products are kept in memory for this sample app and reset when the app restarts.
+            New sweets are kept in memory for this sample app and reset when the app restarts.
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -236,7 +236,7 @@ export function AddProductForm() {
         visible={snackbar !== null}
         onDismiss={() => setSnackbar(null)}
         duration={4000}
-        action={{ label: 'View market', onPress: () => router.navigate('/') }}>
+        action={{ label: 'View menu', onPress: () => router.navigate('/') }}>
         {snackbar}
       </Snackbar>
     </>

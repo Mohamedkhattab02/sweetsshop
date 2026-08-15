@@ -14,8 +14,8 @@
 import { PlatformColor } from 'react-native';
 
 export const IOSColors = {
-  /** The market's green, but Apple's system green so it matches iOS tinting. */
-  accent: PlatformColor('systemGreen'),
+  /** A warm saffron accent that matches the sweets palette on iOS. */
+  accent: PlatformColor('systemOrange'),
   label: PlatformColor('label'),
   secondaryLabel: PlatformColor('secondaryLabel'),
   tertiaryLabel: PlatformColor('tertiaryLabel'),

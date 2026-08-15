@@ -1,9 +1,4 @@
-/**
- * Material 3 filter chips for the category selection on the main page.
- *
- * Multi-select: tapping several chips widens the result set. The leading "All"
- * chip clears the selection and is shown as selected while nothing is filtered.
- */
+/** Android category rail using Material 3 filter-chip semantics. */
 
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, Text, useTheme } from 'react-native-paper';
@@ -25,42 +20,40 @@ export function CategoryFilter({ selected, onToggle, onClear, counts }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.headingRow}>
-        <Text variant="titleMedium">Browse the menu</Text>
+        <Text variant="titleMedium">Explore flavors</Text>
         {!noneSelected ? (
-          <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+          <Text variant="labelMedium" style={{ color: theme.colors.primary }}>
             {selected.length} selected
           </Text>
         ) : null}
       </View>
-
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chipRow}>
+        contentContainerStyle={styles.chipRow}
+        decelerationRate="fast">
         <Chip
-          mode="outlined"
+          mode={noneSelected ? 'flat' : 'outlined'}
           selected={noneSelected}
           showSelectedOverlay
           onPress={onClear}
-          accessibilityLabel="Show all sweets"
-          style={styles.chip}>
-          All
+          style={styles.chip}
+          accessibilityLabel="Show all sweets">
+          All sweets
         </Chip>
-
         {CATEGORIES.map((category) => {
           const isSelected = selected.includes(category.id);
-          const count = counts[category.id] ?? 0;
           return (
             <Chip
               key={category.id}
-              mode="outlined"
+              mode={isSelected ? 'flat' : 'outlined'}
               icon={isSelected ? undefined : iconSource(category.icon)}
               selected={isSelected}
               showSelectedOverlay
               onPress={() => onToggle(category.id)}
-              accessibilityLabel={`${category.label}, ${count} sweets`}
-              style={styles.chip}>
-              {`${category.label} (${count})`}
+              style={styles.chip}
+              accessibilityLabel={`${category.label}, ${counts[category.id] ?? 0} sweets`}>
+              {`${category.label} · ${counts[category.id] ?? 0}`}
             </Chip>
           );
         })}
@@ -71,18 +64,17 @@ export function CategoryFilter({ selected, onToggle, onClear, counts }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 8,
+    gap: 10,
   },
   headingRow: {
+    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
   },
   chipRow: {
     paddingHorizontal: 16,
     gap: 8,
-    paddingVertical: 2,
   },
   chip: {
     marginRight: 0,

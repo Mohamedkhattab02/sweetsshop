@@ -33,7 +33,7 @@ export function MarketTabs() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Market',
+          title: 'Menu',
           tabBarIcon: ({ color, focused }) => (
             <AppIcon name={focused ? 'storeOpen' : 'store'} size={26} color={color} />
           ),
@@ -42,7 +42,7 @@ export function MarketTabs() {
       <Tabs.Screen
         name="add"
         options={{
-          title: 'Add product',
+          title: 'Add sweet',
           tabBarIcon: ({ color }) => <AppIcon name="addProduct" size={26} color={color} />,
         }}
       />

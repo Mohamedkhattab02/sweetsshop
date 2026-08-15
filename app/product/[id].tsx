@@ -42,9 +42,9 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-        <ScreenHeader title="Product" onBack={() => router.back()} />
+        <ScreenHeader title="Sweet" onBack={() => router.back()} />
         <View style={styles.missing}>
-          <Text variant="titleMedium">This product is no longer in the market.</Text>
+          <Text variant="titleMedium">This sweet is no longer on the menu.</Text>
           <Button mode="contained-tonal" onPress={() => router.back()}>
             Go back
           </Button>
@@ -56,6 +56,7 @@ export default function ProductDetailScreen() {
   const category = getCategory(product.category);
   const showPlaceholder = !product.image || failed;
   const alreadyInCart = getQuantity(product.id);
+  const maxAvailable = Math.min(MAX_QUANTITY_PER_LINE, product.stockQuantity);
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -125,6 +126,12 @@ export default function ProductDetailScreen() {
             </Text>
           </View>
 
+          {product.weight ? (
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+              {product.weight}
+            </Text>
+          ) : null}
+
           {product.description ? (
             <Text variant="bodyLarge" style={styles.description}>
               {product.description}
@@ -141,6 +148,19 @@ export default function ProductDetailScreen() {
             />
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
               {status.message}
+            </Text>
+          </View>
+
+          <View style={styles.statusRow}>
+            <AppIcon
+              name={product.available && product.stockQuantity > 0 ? 'checkCircle' : 'info'}
+              size={22}
+              color={product.available && product.stockQuantity > 0 ? theme.colors.primary : theme.colors.error}
+            />
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+              {product.available && product.stockQuantity > 0
+                ? `${product.stockQuantity} available for today`
+                : 'Currently sold out — check back soon'}
             </Text>
           </View>
 
@@ -172,9 +192,9 @@ export default function ProductDetailScreen() {
                 icon={iconSource('plus')}
                 mode="outlined"
                 size={18}
-                disabled={quantity >= MAX_QUANTITY_PER_LINE}
+                disabled={quantity >= maxAvailable}
                 onPress={() =>
-                  setQuantity((value) => Math.min(MAX_QUANTITY_PER_LINE, value + 1))
+                  setQuantity((value) => Math.min(maxAvailable, value + 1))
                 }
                 accessibilityLabel="Increase quantity"
               />
@@ -185,13 +205,14 @@ export default function ProductDetailScreen() {
             mode="contained"
             icon={iconSource('cartAdd')}
             onPress={handleAddToCart}
+            disabled={!product.available || product.stockQuantity <= 0}
             contentStyle={styles.ctaContent}
             style={styles.cta}>
             {`Add to cart · ${formatPrice(product.price * quantity)}`}
           </Button>
 
           <Button mode="text" icon={iconSource('store')} onPress={() => router.back()}>
-            Keep shopping
+            Keep browsing sweets
           </Button>
         </View>
       </ScrollView>
