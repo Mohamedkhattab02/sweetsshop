@@ -125,7 +125,9 @@ const styles = StyleSheet.create({
     gap: 18,
   },
   sideRight: {
+    minWidth: 96,
     justifyContent: 'flex-end',
+    gap: 18,
   },
   backButton: {
     flexDirection: 'row',
@@ -147,7 +149,10 @@ const styles = StyleSheet.create({
     color: IOSColors.label,
   },
   action: {
-    padding: 2,
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   largeTitleRow: {
     height: LARGE_TITLE_HEIGHT,
@@ -164,7 +169,7 @@ const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
     top: -4,
-    right: -8,
+    right: -2,
     minWidth: 18,
     height: 18,
     borderRadius: 9,

@@ -58,6 +58,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(tabs)" />
                 <Stack.Screen name="product/[id]" />
                 <Stack.Screen name="checkout" />
+                <Stack.Screen name="orders" />
                 {/* The confirmation replaces checkout in the stack, so Back
                     from here returns to the market rather than the form. */}
                 <Stack.Screen name="order/[id]" options={{ gestureEnabled: false }} />

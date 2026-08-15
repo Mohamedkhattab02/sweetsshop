@@ -24,6 +24,14 @@ export type Customer = {
   address?: string;
 };
 
+export type OrderStatus =
+  | 'pending'
+  | 'accepted'
+  | 'preparing'
+  | 'ready'
+  | 'completed'
+  | 'declined';
+
 export type Order = {
   id: string;
   /** Short human-readable code shown on the confirmation screen. */
@@ -33,6 +41,7 @@ export type Order = {
   itemCount: number;
   customer: Customer;
   placedAt: number;
+  status: OrderStatus;
 };
 
 export const MAX_QUANTITY_PER_LINE = 99;
@@ -51,7 +60,8 @@ type Action =
   | { type: 'set-quantity'; productId: string; quantity: number }
   | { type: 'remove'; productId: string }
   | { type: 'clear' }
-  | { type: 'place-order'; order: Order };
+  | { type: 'place-order'; order: Order }
+  | { type: 'update-order-status'; orderId: string; status: OrderStatus };
 
 const clampQuantity = (quantity: number) =>
   Math.max(0, Math.min(MAX_QUANTITY_PER_LINE, Math.round(quantity)));
@@ -97,6 +107,14 @@ function reducer(state: State, action: Action): State {
 
     case 'place-order':
       return { lines: [], orders: [action.order, ...state.orders] };
+
+    case 'update-order-status':
+      return {
+        ...state,
+        orders: state.orders.map((order) =>
+          order.id === action.orderId ? { ...order, status: action.status } : order
+        ),
+      };
   }
 }
 
@@ -118,7 +136,9 @@ type CartContextValue = {
   getQuantity: (productId: string) => number;
   placeOrder: (customer: Customer) => Order;
   orders: Order[];
+  pendingOrderCount: number;
   getOrderById: (id: string) => Order | undefined;
+  updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -176,6 +196,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           address: customer.address?.trim() || undefined,
         },
         placedAt: Date.now(),
+        status: 'pending',
       };
       dispatch({ type: 'place-order', order });
       return order;
@@ -185,6 +206,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getOrderById = useCallback(
     (id: string) => state.orders.find((order) => order.id === id),
+    [state.orders]
+  );
+
+  const updateOrderStatus = useCallback((orderId: string, status: OrderStatus) => {
+    dispatch({ type: 'update-order-status', orderId, status });
+  }, []);
+
+  const pendingOrderCount = useMemo(
+    () => state.orders.filter((order) => order.status === 'pending').length,
     [state.orders]
   );
 
@@ -201,7 +231,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       getQuantity,
       placeOrder,
       orders: state.orders,
+      pendingOrderCount,
       getOrderById,
+      updateOrderStatus,
     }),
     [
       state.lines,
@@ -215,6 +247,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       getQuantity,
       placeOrder,
       getOrderById,
+      updateOrderStatus,
+      pendingOrderCount,
     ]
   );
 

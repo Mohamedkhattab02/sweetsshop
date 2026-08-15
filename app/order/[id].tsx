@@ -7,8 +7,9 @@
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Divider, Surface, Text, useTheme } from 'react-native-paper';
+import { Button, Divider, Snackbar, Surface, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useState } from 'react';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { iconSource } from '@/components/ui/icon-source';
@@ -24,9 +25,13 @@ export default function OrderConfirmationScreen() {
   const headerInset = useScreenHeaderInset();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getOrderById } = useCart();
+  const [ownerNoticeVisible, setOwnerNoticeVisible] = useState(true);
 
   const order = getOrderById(id);
   const status = getMarketStatus();
+  // Expo Router's generated route types can lag behind a newly added screen;
+  // the /orders file is a real static route and is registered in the root stack.
+  const openOwnerInbox = () => router.push('/orders' as never);
 
   if (!order) {
     return (
@@ -139,6 +144,15 @@ export default function OrderConfirmationScreen() {
         </Surface>
 
         <Button
+          mode="contained-tonal"
+          icon={iconSource('checkout')}
+          onPress={openOwnerInbox}
+          contentStyle={styles.ctaContent}
+          style={styles.cta}>
+          Open shop owner inbox
+        </Button>
+
+        <Button
           mode="contained"
           icon={iconSource('store')}
           onPress={() => router.navigate('/')}
@@ -147,6 +161,17 @@ export default function OrderConfirmationScreen() {
           Back to the menu
         </Button>
       </ScrollView>
+
+      <Snackbar
+        visible={ownerNoticeVisible}
+        onDismiss={() => setOwnerNoticeVisible(false)}
+        duration={8000}
+        action={{
+          label: 'View orders',
+          onPress: openOwnerInbox,
+        }}>
+        {`New order ${order.reference} is waiting for approval.`}
+      </Snackbar>
     </View>
   );
 }

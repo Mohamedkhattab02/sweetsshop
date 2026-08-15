@@ -5,7 +5,7 @@
 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Divider, Portal, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -24,6 +24,9 @@ export default function CartScreen() {
   const headerInset = useScreenHeaderInset(true);
   const { lines, itemCount, subtotal, isEmpty, setQuantity, removeFromCart, clearCart } = useCart();
   const [confirmClear, setConfirmClear] = useState(false);
+  // NativeTabs overlays the bottom edge of iOS tab routes. Lift the checkout
+  // surface above it without changing the Android Material layout.
+  const bottomTabClearance = Platform.OS === 'ios' ? Math.max(insets.bottom + 52, 84) : 0;
 
   const status = getMarketStatus();
 
@@ -86,7 +89,13 @@ export default function CartScreen() {
             variant="regular"
             androidElevation={3}
             androidBackgroundColor={theme.colors.elevation.level3}
-            style={[styles.summary, { paddingBottom: insets.bottom > 0 ? 12 : 16 }]}>
+            style={[
+              styles.summary,
+              {
+                paddingBottom: insets.bottom > 0 ? 12 : 16,
+                marginBottom: bottomTabClearance,
+              },
+            ]}>
             <View style={styles.summaryRow}>
               <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
                 {`Total (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`}

@@ -54,6 +54,9 @@ export function AddProductForm() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const headerInset = useScreenHeaderInset(true);
+  // NativeTabs is drawn above the route content on iOS. Keep the final
+  // action comfortably above the Liquid Glass tab bar and home indicator.
+  const bottomTabClearance = Math.max(insets.bottom + 64, 96);
 
   const form = useAddProductForm({
     onNotify: (message) => Alert.alert('Camera unavailable', message),
@@ -99,7 +102,7 @@ export function AddProductForm() {
         style={styles.groupedBackground}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: headerInset + 16, paddingBottom: insets.bottom + 40 },
+          { paddingTop: headerInset + 16, paddingBottom: bottomTabClearance },
         ]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive">

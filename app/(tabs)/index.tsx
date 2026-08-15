@@ -10,7 +10,7 @@
  */
 
 import { useRouter } from 'expo-router';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { AnimatedFAB, Button, Text, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMemo, useState } from 'react';
@@ -35,7 +35,13 @@ export default function MarketScreen() {
   const insets = useSafeAreaInsets();
   const headerInset = useScreenHeaderInset(true);
   const [fabExtended, setFabExtended] = useState(true);
-  const { itemCount } = useCart();
+  const { itemCount, pendingOrderCount } = useCart();
+  // iOS NativeTabs overlays the bottom of the route. Keep the floating action
+  // button and the final product row above that system bar.
+  const bottomTabClearance = Platform.OS === 'ios' ? Math.max(insets.bottom + 64, 96) : 0;
+  // The route is registered in the root stack; this cast keeps navigation
+  // working while Expo's generated typed-route file catches up with new files.
+  const openOwnerInbox = () => router.navigate('/orders' as never);
 
   const {
     visibleProducts,
@@ -57,9 +63,18 @@ export default function MarketScreen() {
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
       <ScreenHeader
-        title="Nour Sweets"
+        title="mahroum Sweets"
         large
         actions={[
+          {
+            icon: 'checkout',
+            label:
+              pendingOrderCount > 0
+                ? `Open incoming orders, ${pendingOrderCount} waiting`
+                : 'Open incoming orders',
+            onPress: openOwnerInbox,
+            badge: pendingOrderCount,
+          },
           {
             icon: itemCount > 0 ? 'cartFilled' : 'cart',
             label: itemCount > 0 ? `Open the cart, ${itemCount} items` : 'Open the cart, empty',
@@ -76,7 +91,11 @@ export default function MarketScreen() {
         columnWrapperStyle={styles.column}
         contentContainerStyle={[
           styles.listContent,
-          { paddingTop: headerInset + 8, paddingBottom: insets.bottom + 96 },
+          {
+            paddingTop: headerInset + 8,
+            paddingBottom:
+              Platform.OS === 'ios' ? bottomTabClearance + 24 : insets.bottom + 96,
+          },
         ]}
         showsVerticalScrollIndicator={false}
         // Collapse the FAB while scrolling so it never hides a product.
@@ -142,7 +161,7 @@ export default function MarketScreen() {
         extended={fabExtended}
         onPress={() => router.navigate('/add')}
         accessibilityLabel="Add a new sweet to the menu"
-        style={[styles.fab, { bottom: insets.bottom + 16 }]}
+        style={[styles.fab, { bottom: Platform.OS === 'ios' ? bottomTabClearance : insets.bottom + 16 }]}
       />
     </View>
   );
