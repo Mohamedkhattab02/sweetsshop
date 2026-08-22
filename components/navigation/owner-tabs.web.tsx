@@ -10,6 +10,7 @@ export function OwnerTabs() {
   const { width } = useWindowDimensions();
   const { pendingOrderCount } = useCart();
   const desktop = width >= 980;
+  const compact = width < 360;
 
   return (
     <Tabs
@@ -20,9 +21,9 @@ export function OwnerTabs() {
         tabBarActiveTintColor: colors.coralDark,
         tabBarInactiveTintColor: colors.inkSoft,
         tabBarActiveBackgroundColor: colors.cream,
-        tabBarLabelStyle: styles.mobileLabel,
+        tabBarLabelStyle: [styles.mobileLabel, compact && styles.compactLabel],
         tabBarItemStyle: styles.mobileItem,
-        tabBarStyle: styles.mobileBar,
+        tabBarStyle: [styles.mobileBar, compact && styles.compactBar],
         sceneStyle: styles.scene,
       }}>
       <Tabs.Screen name="index" options={{ title: 'Overview', tabBarIcon: ({ color }) => <AppIcon name="store" size={22} color={color} /> }} />
@@ -38,5 +39,7 @@ const styles = StyleSheet.create({
   mobileBar: { height: 68, paddingTop: 7, paddingBottom: 7, backgroundColor: colors.white, borderTopColor: colors.line },
   mobileItem: { paddingVertical: 2 },
   mobileLabel: { fontFamily: fonts.bold, fontSize: 10 },
+  compactLabel: { fontSize: 8 },
+  compactBar: { height: 64, paddingTop: 5, paddingBottom: 5 },
   badge: { backgroundColor: colors.coral, color: colors.white },
 });

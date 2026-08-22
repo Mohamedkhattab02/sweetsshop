@@ -10,7 +10,7 @@ import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { openGoogleMaps } from '@/services/maps';
 import {
   CURRENT_COURIER,
@@ -127,7 +127,7 @@ export default function CourierDashboardScreen() {
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, responsive.mediumPage, { paddingBottom: insets.bottom + 32 }]}>
+        contentContainerStyle={[styles.content, responsive.mediumPage, { paddingHorizontal: getPageGutter(width), paddingBottom: insets.bottom + 32 }]}>
         <View style={[styles.topGrid, desktop && styles.topGridDesktop]}>
         <Animated.View entering={FadeInUp.duration(600)} style={[styles.welcomeCard, desktop && styles.welcomeCardDesktop]}>
           <View style={styles.welcomeIcon}>

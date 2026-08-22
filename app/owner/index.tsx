@@ -8,7 +8,7 @@ import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { useCart } from '@/store/cart';
 import { useProducts } from '@/store/products';
 
@@ -17,6 +17,7 @@ export default function OwnerDashboardScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const desktop = Platform.OS === 'web' && width >= 1180;
+  const compact = Platform.OS === 'web' && width < 420;
   const { products } = useProducts();
   const { orders, pendingOrderCount, unreadNotificationCount } = useCart();
   const revenue = orders.filter((order) => order.status !== 'declined').reduce((sum, order) => sum + order.total, 0);
@@ -25,7 +26,7 @@ export default function OwnerDashboardScreen() {
   return (
     <View style={styles.screen}>
       <ModernHeader eyebrow="OWNER WORKSPACE" title="Good morning" subtitle="Your shop, stock, and order flow in one clear view" notificationCount={unreadNotificationCount('owner')} onNotifications={() => router.push('/notifications?audience=owner' as never)} onSwitchRole={() => router.replace('/role-selection' as never)} />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.page, { paddingBottom: insets.bottom + 28 }]}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.page, { paddingHorizontal: getPageGutter(width), paddingBottom: insets.bottom + 28 }]}>
         <View style={[styles.overviewGrid, desktop && styles.overviewGridDesktop]}>
         <Animated.View entering={FadeInUp.duration(600)} style={[styles.missionCard, desktop && styles.missionCardDesktop]}>
           <View style={styles.missionTop}><View style={styles.statusPill}><View style={styles.liveDot} /><Text style={styles.statusText}>STORE ONLINE</Text></View><AppIcon name="sparkle" size={19} color={colors.gold} /></View>
@@ -54,7 +55,7 @@ export default function OwnerDashboardScreen() {
         <View style={[styles.lowerGrid, desktop && styles.lowerGridDesktop]}>
         <View style={styles.shortcutColumn}>
         <View style={styles.sectionHeading}><View><Text style={styles.kicker}>SHORTCUTS</Text><Text style={styles.title}>Make a move</Text></View></View>
-        <View style={styles.quickGrid}><QuickAction icon="addProduct" label="Add sweet" sub="New to the counter" onPress={() => router.push('/owner/add-product' as never)} /><QuickAction icon="tag" label="Stock check" sub={`${lowStock} items low`} onPress={() => router.push('/owner/catalog' as never)} /><QuickAction icon="sparkle" label="Insights" sub="See what’s moving" onPress={() => router.push('/owner/analytics' as never)} /></View>
+        <View style={[styles.quickGrid, compact && styles.quickGridCompact]}><QuickAction compact={compact} icon="addProduct" label="Add sweet" sub="New to the counter" onPress={() => router.push('/owner/add-product' as never)} /><QuickAction compact={compact} icon="tag" label="Stock check" sub={`${lowStock} items low`} onPress={() => router.push('/owner/catalog' as never)} /><QuickAction compact={compact} icon="sparkle" label="Insights" sub="See what’s moving" onPress={() => router.push('/owner/analytics' as never)} /></View>
         </View>
 
         <View style={styles.ordersColumn}>
@@ -73,8 +74,8 @@ function MetricCard({ label, value, helper, icon, tone }: { label: string; value
   return <View style={styles.metric}><View style={[styles.metricIcon, { backgroundColor: toneColor }]}><AppIcon name={icon} size={17} color={colors.ink} /></View><Text style={styles.metricLabel}>{label}</Text><Text style={styles.metricValue}>{value}</Text><Text style={styles.metricHelper}>{helper}</Text></View>;
 }
 
-function QuickAction({ icon, label, sub, onPress }: { icon: 'addProduct' | 'tag' | 'sparkle'; label: string; sub: string; onPress: () => void }) {
-  return <GSPressable onPress={onPress} className="active:opacity-75" style={styles.quickAction as never}><View style={styles.quickIcon}><AppIcon name={icon} size={19} color={colors.coralDark} /></View><Text style={styles.quickLabel}>{label}</Text><Text style={styles.quickSub}>{sub}</Text></GSPressable>;
+function QuickAction({ icon, label, sub, compact, onPress }: { icon: 'addProduct' | 'tag' | 'sparkle'; label: string; sub: string; compact: boolean; onPress: () => void }) {
+  return <GSPressable onPress={onPress} className="active:opacity-75" style={[styles.quickAction, compact && styles.quickActionCompact] as never}><View style={styles.quickIcon}><AppIcon name={icon} size={19} color={colors.coralDark} /></View><Text style={styles.quickLabel}>{label}</Text><Text style={styles.quickSub}>{sub}</Text></GSPressable>;
 }
 
 function RecentOrder({ reference, customer, total, status, onPress }: { reference: string; customer: string; total: number; status: string; onPress: () => void }) {
@@ -122,7 +123,9 @@ const styles = StyleSheet.create({
   shortcutColumn: { flex: 0.82, gap: 12 },
   ordersColumn: { flex: 1.18, gap: 10 },
   quickGrid: { flexDirection: 'row', gap: 10 },
+  quickGridCompact: { flexWrap: 'wrap' },
   quickAction: { flex: 1, minHeight: 112, backgroundColor: colors.white, borderRadius: 15, borderWidth: 1, borderColor: colors.line, padding: 12, ...shadow.card },
+  quickActionCompact: { minWidth: '46%' },
   quickIcon: { width: 32, height: 32, borderRadius: 11, backgroundColor: colors.cream, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
   quickLabel: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
   quickSub: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 9, lineHeight: 13, marginTop: 3 },

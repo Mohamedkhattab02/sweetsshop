@@ -8,7 +8,7 @@ import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice, getMarketStatus } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { useCart, type CartLine } from '@/store/cart';
 
 export default function CustomerCartScreen() {
@@ -16,6 +16,8 @@ export default function CustomerCartScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const desktop = Platform.OS === 'web' && width >= 1120;
+  const compact = Platform.OS === 'web' && width < 380;
+  const pageGutter = getPageGutter(width);
   const { lines, itemCount, subtotal, isEmpty, setQuantity, removeFromCart, clearCart } = useCart();
   const status = getMarketStatus();
 
@@ -50,7 +52,7 @@ export default function CustomerCartScreen() {
         <View style={[styles.cartLayout, desktop && styles.cartLayoutDesktop]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.content, desktop ? styles.desktopContent : responsive.mediumPage, { paddingBottom: desktop ? 40 : insets.bottom + 182 }]}
+          contentContainerStyle={[styles.content, desktop ? styles.desktopContent : responsive.mediumPage, !desktop && { paddingHorizontal: pageGutter }, { paddingBottom: desktop ? 40 : insets.bottom + 182 }]}
           style={styles.cartScroll}>
           <View style={styles.listHeader}>
             <Text style={styles.sectionTitle}>Selected for you</Text>
@@ -64,6 +66,7 @@ export default function CustomerCartScreen() {
                 <CartLineItem
                 key={line.product.id}
                 line={line}
+                compact={compact}
                 onChange={(quantity) => setQuantity(line.product.id, quantity)}
                 onRemove={() => removeFromCart(line.product.id)}
                 onPress={() => router.push(`/product/${line.product.id}` as never)}
@@ -91,7 +94,7 @@ export default function CustomerCartScreen() {
 
       {!isEmpty && !desktop ? (
         <View style={[styles.checkoutBar, { paddingBottom: insets.bottom + 12 }]}>
-          <View style={[styles.checkoutBarInner, responsive.mediumPage]}>
+          <View style={[styles.checkoutBarInner, responsive.mediumPage, { paddingHorizontal: pageGutter }]}>
             <CheckoutSummary itemCount={itemCount} subtotal={subtotal} onCheckout={() => router.push('/checkout')} />
           </View>
         </View>
@@ -127,18 +130,20 @@ function CheckoutSummary({ itemCount, subtotal, onCheckout, desktop = false }: {
 
 function CartLineItem({
   line,
+  compact,
   onChange,
   onRemove,
   onPress,
 }: {
   line: CartLine;
+  compact: boolean;
   onChange: (quantity: number) => void;
   onRemove: () => void;
   onPress: () => void;
 }) {
   return (
-    <GSPressable onPress={onPress} className="active:opacity-75" style={styles.line as never}>
-      <Image source={{ uri: line.product.image }} style={styles.thumb} contentFit="cover" />
+    <GSPressable onPress={onPress} className="active:opacity-75" style={[styles.line, compact && styles.lineCompact] as never}>
+      <Image source={{ uri: line.product.image }} style={[styles.thumb, compact && styles.thumbCompact]} contentFit="cover" />
       <View style={styles.lineMain}>
         <View style={styles.lineTitleRow}>
           <View style={styles.lineCopy}>
@@ -186,7 +191,9 @@ const styles = StyleSheet.create({
   clearText: { color: colors.coralDark, fontFamily: fonts.bold, fontSize: 12 },
   lines: { gap: 11 },
   line: { backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 10, flexDirection: 'row', gap: 12, ...shadow.card },
+  lineCompact: { padding: 8, gap: 8 },
   thumb: { width: 88, height: 96, borderRadius: 12, backgroundColor: colors.sage },
+  thumbCompact: { width: 70, height: 84, borderRadius: 10 },
   lineMain: { flex: 1, justifyContent: 'space-between', paddingVertical: 3, gap: 13 },
   lineTitleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 5 },
   lineCopy: { flex: 1, gap: 5 },

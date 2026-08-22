@@ -18,12 +18,20 @@ html,
 body,
 #root {
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
   background: #f7f8f5;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   color: #1d2622;
+  overflow-x: hidden;
   overscroll-behavior-y: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,6 +46,7 @@ button {
 [role='button'],
 [role='link'] {
   cursor: pointer;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -58,6 +67,11 @@ button {
 }
 
 @media (max-width: 767px) {
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
+
   *:focus-visible {
     outline-width: 2px;
   }

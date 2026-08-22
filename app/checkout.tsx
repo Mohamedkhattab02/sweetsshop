@@ -10,7 +10,7 @@ import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { buildGoogleMapsUrl } from '@/constants/maps';
 import { formatPrice } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { openGoogleMaps } from '@/services/maps';
 import { useCart, type FulfillmentMethod } from '@/store/cart';
 
@@ -21,6 +21,7 @@ export default function CheckoutScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const desktop = Platform.OS === 'web' && width >= 1040;
+  const compact = Platform.OS === 'web' && width < 420;
   const { lines, itemCount, subtotal, isEmpty, placeOrder } = useCart();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -117,7 +118,7 @@ export default function CheckoutScreen() {
     <View style={styles.screen}>
       <ModernHeader title="Almost yours" subtitle="A few details and we’ll get started" showBack onSwitchRole={() => router.replace('/role-selection' as never)} />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, responsive.mediumPage, { paddingBottom: insets.bottom + 35 }]}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, responsive.mediumPage, { paddingHorizontal: getPageGutter(width), paddingBottom: insets.bottom + 35 }]}>
           <View style={[styles.checkoutGrid, desktop && styles.checkoutGridDesktop]}>
           <View style={[styles.summaryCard, desktop && styles.summaryCardDesktop]}>
             <View style={styles.summaryTop}><View><Text style={styles.summaryKicker}>YOUR BOX</Text><Text style={styles.summaryTitle}>{itemCount} little joys</Text></View><Text style={styles.summaryTotal}>{formatPrice(subtotal)}</Text></View>
@@ -155,11 +156,11 @@ export default function CheckoutScreen() {
                 message={locationMessage}
                 onPress={setCurrentLocation}
               />
-              <View style={styles.addressFields}>
+              <View style={[styles.addressFields, compact && styles.addressFieldsCompact]}>
                 <View style={styles.addressColumn}><Field label="Street" icon="address" value={street} onChange={setStreet} placeholder="Street name" error={submitted ? streetError : null} required /></View>
                 <View style={styles.addressColumn}><Field label="House number" icon="info" value={houseNumber} onChange={setHouseNumber} placeholder="12" keyboardType="numeric" error={submitted ? houseNumberError : null} required /></View>
               </View>
-              <View style={styles.addressFields}>
+              <View style={[styles.addressFields, compact && styles.addressFieldsCompact]}>
                 <View style={styles.addressColumn}><Field label="Floor" icon="info" value={floor} onChange={setFloor} placeholder="3" keyboardType="numeric" /></View>
                 <View style={styles.addressColumn}><Field label="Apartment" icon="info" value={apartment} onChange={setApartment} placeholder="8" keyboardType="numeric" /></View>
               </View>
@@ -252,6 +253,7 @@ const styles = StyleSheet.create({
   coordinates: { color: colors.inkSoft, fontSize: 9, textAlign: 'center' },
   locationMessage: { color: colors.inkSoft, fontSize: 10, lineHeight: 15, textAlign: 'center' },
   addressFields: { flexDirection: 'row', gap: 10 },
+  addressFieldsCompact: { flexDirection: 'column' },
   addressColumn: { flex: 1 },
   fieldWrap: { gap: 6 },
   fieldLabel: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },

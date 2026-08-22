@@ -22,7 +22,13 @@ export function ModernSweetCard({ product, onPress, compact = false }: Props) {
   const { addToCart, getQuantity } = useCart();
   const category = getCategory(product.category);
   const inCart = getQuantity(product.id);
-  const cardWidth = compact ? Math.min(width * 0.43, Platform.OS === 'web' ? 220 : 190) : Platform.OS === 'web' ? undefined : (width - 48) / 2;
+  const cardWidth = compact
+    ? Platform.OS === 'web'
+      ? Math.min(220, Math.max(176, width * 0.62))
+      : Math.min(width * 0.43, 190)
+    : Platform.OS === 'web'
+      ? undefined
+      : (width - 48) / 2;
 
   return (
     <GSPressable

@@ -11,7 +11,7 @@ import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { CATEGORIES, getMarketStatus } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { useCart } from '@/store/cart';
 import { useProducts, type Product } from '@/store/products';
 
@@ -27,8 +27,19 @@ export default function CustomerHomeScreen() {
   const status = getMarketStatus();
   const isWeb = Platform.OS === 'web';
   const desktop = isWeb && width >= 980;
+  const compactPhone = isWeb && width < 360;
   const availableWidth = width - (desktop ? 264 : 0);
-  const columnCount = isWeb ? (availableWidth >= 1120 ? 4 : availableWidth >= 760 ? 3 : 2) : 2;
+  const pageGutter = getPageGutter(availableWidth);
+  const gridWidth = availableWidth - pageGutter * 2;
+  const columnCount = isWeb
+    ? gridWidth >= 1040
+      ? 4
+      : gridWidth >= 700
+        ? 3
+        : gridWidth >= 330
+          ? 2
+          : 1
+    : 2;
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase();
@@ -65,18 +76,18 @@ export default function CustomerHomeScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, responsive.page, { paddingBottom: insets.bottom + 34 }]}
+        contentContainerStyle={[styles.content, responsive.page, { paddingHorizontal: pageGutter, paddingBottom: insets.bottom + 34 }]}
         keyboardShouldPersistTaps="handled">
         <View style={[styles.heroLayout, desktop && styles.heroLayoutDesktop]}>
-          <Animated.View entering={FadeInUp.duration(650)} style={[styles.hero, desktop && styles.heroDesktop, shadow.floating]}>
+          <Animated.View entering={FadeInUp.duration(650)} style={[styles.hero, compactPhone && styles.heroCompact, desktop && styles.heroDesktop, shadow.floating]}>
             <Image source={heroImage} style={StyleSheet.absoluteFill} contentFit="cover" />
             <View style={styles.heroShade} />
-            <View style={[styles.heroCopy, desktop && styles.heroCopyDesktop]}>
+            <View style={[styles.heroCopy, compactPhone && styles.heroCopyCompact, desktop && styles.heroCopyDesktop]}>
               <View style={styles.heroPill}>
                 <View style={styles.liveDot} />
                 <Text style={styles.heroPillText}>{status.isOpen ? 'OPEN TODAY' : 'ORDER AHEAD'}</Text>
               </View>
-              <Text style={[styles.heroTitle, desktop && styles.heroTitleDesktop]}>Fresh from our ovens.{`\n`}Ready for your table.</Text>
+              <Text style={[styles.heroTitle, compactPhone && styles.heroTitleCompact, desktop && styles.heroTitleDesktop]}>Fresh from our ovens.{`\n`}Ready for your table.</Text>
               <Text style={[styles.heroSubtitle, desktop && styles.heroSubtitleDesktop]}>Build a thoughtful box from today’s small-batch selection.</Text>
               <GSPressable
                 onPress={() => router.push('/(tabs)/cart' as never)}
@@ -114,7 +125,7 @@ export default function CustomerHomeScreen() {
           </Animated.View>
         </View>
 
-        <View style={[styles.discoveryPanel, isWeb && styles.discoveryPanelWeb]}>
+        <View style={[styles.discoveryPanel, isWeb && availableWidth >= 600 && styles.discoveryPanelWeb]}>
         <View style={styles.searchBox}>
           <AppIcon name="search" size={20} color={colors.inkSoft} />
           <TextInput
@@ -212,9 +223,9 @@ export default function CustomerHomeScreen() {
         </View>
 
         {gridRows.length > 0 ? (
-          <View style={styles.grid}>
+          <View style={[styles.grid, compactPhone && styles.gridCompact]}>
             {gridRows.map((row, rowIndex) => (
-              <View key={`row-${rowIndex}`} style={styles.gridRow}>
+              <View key={`row-${rowIndex}`} style={[styles.gridRow, compactPhone && styles.gridRowCompact]}>
                 {row.map((product) => (
                   <ModernSweetCard
                     key={product.id}
@@ -258,14 +269,17 @@ const styles = StyleSheet.create({
   heroLayout: { gap: 16 },
   heroLayoutDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 18 },
   hero: { minHeight: 330, borderRadius: 20, overflow: 'hidden', position: 'relative', backgroundColor: colors.ink },
+  heroCompact: { minHeight: 290, borderRadius: 16 },
   heroDesktop: { flex: 1.9, minHeight: 460, borderRadius: 22 },
   heroShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(18, 27, 22, 0.1)' },
   heroCopy: { flex: 1, justifyContent: 'flex-end', padding: 24, gap: 10, maxWidth: 610 },
+  heroCopyCompact: { padding: 18, gap: 8 },
   heroCopyDesktop: { padding: 40, gap: 13 },
   heroPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: radii.pill, paddingHorizontal: 10, paddingVertical: 7 },
   liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#A9E7BA' },
   heroPillText: { color: '#F3F7F4', fontFamily: fonts.extraBold, fontSize: 9, letterSpacing: 1.1 },
   heroTitle: { color: colors.white, fontFamily: fonts.display, fontSize: 38, lineHeight: 41, letterSpacing: -0.6 },
+  heroTitleCompact: { fontSize: 31, lineHeight: 34 },
   heroTitleDesktop: { fontSize: 56, lineHeight: 58, letterSpacing: -1.1 },
   heroSubtitle: { color: '#E4EBE7', fontFamily: fonts.medium, fontSize: 13, lineHeight: 20, maxWidth: 300 },
   heroSubtitleDesktop: { fontSize: 15, lineHeight: 23, maxWidth: 420 },
@@ -305,7 +319,9 @@ const styles = StyleSheet.create({
   categoryTextSelected: { color: colors.white },
   productRail: { gap: 16, paddingVertical: 5, paddingRight: 20 },
   grid: { gap: 18 },
+  gridCompact: { gap: 12 },
   gridRow: { flexDirection: 'row', gap: 18 },
+  gridRowCompact: { gap: 12 },
   gridFiller: { flex: 1 },
   emptyState: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 34, gap: 8 },
   emptyTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 17 },

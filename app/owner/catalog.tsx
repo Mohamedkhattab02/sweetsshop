@@ -9,7 +9,7 @@ import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice, getCategory } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { useProducts, type Product } from '@/store/products';
 
 export default function OwnerCatalogScreen() {
@@ -26,7 +26,7 @@ export default function OwnerCatalogScreen() {
   return (
     <View style={styles.screen}>
       <ModernHeader eyebrow="OWNER WORKSPACE" title="Catalog" subtitle={`${products.length} sweets on your counter`} onSwitchRole={() => router.replace('/role-selection' as never)} />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.mediumPage, { paddingBottom: insets.bottom + 28 }]} keyboardShouldPersistTaps="handled">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.mediumPage, { paddingHorizontal: getPageGutter(width), paddingBottom: insets.bottom + 28 }]} keyboardShouldPersistTaps="handled">
         <View style={styles.actionRow}><View style={styles.search}><AppIcon name="search" size={18} color={colors.inkSoft} /><TextInput value={query} onChangeText={setQuery} placeholder="Search menu" placeholderTextColor="#95A19B" style={styles.searchInput} /></View><GSPressable onPress={() => router.push('/owner/add-product' as never)} style={styles.addButton as never}><AppIcon name="plus" size={19} color={colors.white} /></GSPressable></View>
         <View style={styles.filters}><GSPressable onPress={() => setOnlyLowStock((value) => !value)} style={[styles.filterPill, onlyLowStock && styles.filterSelected] as never}><AppIcon name="info" size={14} color={onlyLowStock ? colors.white : colors.coralDark} /><Text style={[styles.filterText, onlyLowStock && styles.filterTextSelected]}>Low stock only</Text></GSPressable><Text style={styles.resultCount}>{filtered.length} shown</Text></View>
         <View style={styles.insight}><View style={styles.insightIcon}><AppIcon name="sparkle" size={17} color={colors.coralDark} /></View><View style={styles.insightCopy}><Text style={styles.insightTitle}>Keep the shelf feeling abundant</Text><Text style={styles.insightText}>Tap the stock controls to update quantities in real time.</Text></View></View>

@@ -8,6 +8,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import type { IconName } from '@/constants/icons';
+import { getPageGutter } from '@/constants/responsive';
 
 const heroImage = require('@/assets/images/nour-sweets-web-hero-v2.png');
 
@@ -46,6 +47,7 @@ export default function RoleSelectionScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const desktop = Platform.OS === 'web' && width >= 1040;
+  const compact = Platform.OS === 'web' && width < 360;
 
   const enter = (role: 'customer' | 'owner' | 'courier') => {
     if (role === 'customer') router.replace('/(tabs)' as never);
@@ -61,7 +63,7 @@ export default function RoleSelectionScreen() {
         contentContainerStyle={[
           styles.content,
           desktop && styles.contentDesktop,
-          { paddingTop: insets.top + (desktop ? 24 : 16), paddingBottom: insets.bottom + 20 },
+          { paddingHorizontal: getPageGutter(width), paddingTop: insets.top + (desktop ? 24 : 16), paddingBottom: insets.bottom + 20 },
         ]}>
         <Animated.View entering={FadeInUp.duration(520)} style={styles.topbar}>
           <View style={styles.brandRow}>
@@ -80,7 +82,7 @@ export default function RoleSelectionScreen() {
         </Animated.View>
 
         <View style={[styles.main, desktop && styles.mainDesktop]}>
-          <Animated.View entering={FadeInUp.delay(80).duration(580)} style={[styles.visualPanel, desktop && styles.visualPanelDesktop, shadow.floating]}>
+          <Animated.View entering={FadeInUp.delay(80).duration(580)} style={[styles.visualPanel, compact && styles.visualPanelCompact, desktop && styles.visualPanelDesktop, shadow.floating]}>
             <Image
               source={heroImage}
               style={StyleSheet.absoluteFill}
@@ -88,9 +90,9 @@ export default function RoleSelectionScreen() {
               accessibilityLabel="A bright counter filled with handcrafted Middle Eastern sweets"
             />
             <View style={styles.imageShade} />
-            <View style={styles.visualCopy}>
+            <View style={[styles.visualCopy, compact && styles.visualCopyCompact]}>
               <Text style={styles.visualKicker}>MADE THIS MORNING</Text>
-              <Text style={[styles.visualTitle, desktop && styles.visualTitleDesktop]}>A little celebration,{`\n`}whenever you need one.</Text>
+              <Text style={[styles.visualTitle, compact && styles.visualTitleCompact, desktop && styles.visualTitleDesktop]}>A little celebration,{`\n`}whenever you need one.</Text>
               <Text style={styles.visualText}>Small-batch sweets, thoughtful boxes, and a smoother way to order.</Text>
               <View style={styles.proofRow}>
                 <Proof value="20+" label="fresh favorites" />
@@ -105,13 +107,13 @@ export default function RoleSelectionScreen() {
           <Animated.View entering={FadeInDown.delay(130).duration(580)} style={[styles.rolePanel, desktop && styles.rolePanelDesktop]}>
             <View style={styles.intro}>
               <Text style={styles.kicker}>CHOOSE YOUR SPACE</Text>
-              <Text style={[styles.title, desktop && styles.titleDesktop]}>How are you joining Nour today?</Text>
+              <Text style={[styles.title, compact && styles.titleCompact, desktop && styles.titleDesktop]}>How are you joining Nour today?</Text>
               <Text style={styles.copy}>Each workspace is tailored to the task, with no sign-up or password required.</Text>
             </View>
 
             <View style={styles.choices}>
               {roles.map((role, index) => (
-                <RoleCard key={role.onPress} {...role} primary={index === 0} onSelect={() => enter(role.onPress)} />
+                <RoleCard key={role.onPress} {...role} primary={index === 0} compact={compact} onSelect={() => enter(role.onPress)} />
               ))}
             </View>
 
@@ -141,6 +143,7 @@ function RoleCard({
   icon,
   cta,
   primary,
+  compact,
   onSelect,
 }: {
   title: string;
@@ -148,6 +151,7 @@ function RoleCard({
   icon: IconName;
   cta: string;
   primary: boolean;
+  compact: boolean;
   onSelect: () => void;
 }) {
   return (
@@ -156,7 +160,7 @@ function RoleCard({
       accessibilityRole="button"
       accessibilityLabel={title}
       className="active:opacity-85"
-      style={[styles.roleCard, primary && styles.roleCardPrimary] as never}>
+      style={[styles.roleCard, compact && styles.roleCardCompact, primary && styles.roleCardPrimary] as never}>
       <View style={[styles.roleIcon, primary && styles.roleIconPrimary]}>
         <AppIcon name={icon} size={22} color={primary ? colors.white : colors.ink} />
       </View>
@@ -189,11 +193,14 @@ const styles = StyleSheet.create({
   main: { flex: 1, gap: 22 },
   mainDesktop: { flexDirection: 'row', alignItems: 'stretch', minHeight: 680, paddingBottom: 12 },
   visualPanel: { minHeight: 390, borderRadius: 20, overflow: 'hidden', position: 'relative', backgroundColor: colors.ink },
+  visualPanelCompact: { minHeight: 340, borderRadius: 16 },
   visualPanelDesktop: { flex: 1.05, minHeight: 680 },
   imageShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(21, 30, 25, 0.18)' },
   visualCopy: { flex: 1, justifyContent: 'flex-end', padding: 24, gap: 10, maxWidth: 610 },
+  visualCopyCompact: { padding: 18, gap: 8 },
   visualKicker: { color: '#F6E7BF', fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.8 },
   visualTitle: { color: colors.white, fontFamily: fonts.display, fontSize: 35, lineHeight: 39, letterSpacing: -0.5 },
+  visualTitleCompact: { fontSize: 30, lineHeight: 33 },
   visualTitleDesktop: { fontSize: 54, lineHeight: 57, letterSpacing: -1.1 },
   visualText: { color: '#EEF3EF', fontFamily: fonts.medium, fontSize: 14, lineHeight: 22, maxWidth: 470 },
   proofRow: { flexDirection: 'row', alignItems: 'stretch', gap: 14, marginTop: 12, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.24)' },
@@ -206,10 +213,12 @@ const styles = StyleSheet.create({
   intro: { gap: 8 },
   kicker: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.8 },
   title: { color: colors.ink, fontFamily: fonts.display, fontSize: 36, lineHeight: 40, letterSpacing: -0.5 },
+  titleCompact: { fontSize: 31, lineHeight: 35 },
   titleDesktop: { fontSize: 48, lineHeight: 51, letterSpacing: -0.9 },
   copy: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 14, lineHeight: 22, maxWidth: 540 },
   choices: { gap: 10 },
   roleCard: { minHeight: 118, backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 15, flexDirection: 'row', alignItems: 'center', gap: 13 },
+  roleCardCompact: { padding: 12, gap: 9 },
   roleCardPrimary: { borderColor: colors.coralSoft, backgroundColor: '#FFFBF9' },
   roleIcon: { width: 46, height: 46, borderRadius: 13, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
   roleIconPrimary: { backgroundColor: colors.coral },

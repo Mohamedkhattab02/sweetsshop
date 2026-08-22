@@ -10,6 +10,7 @@ export function MarketTabs() {
   const { width } = useWindowDimensions();
   const { itemCount } = useCart();
   const desktop = width >= 980;
+  const compact = width < 360;
 
   return (
     <Tabs
@@ -20,9 +21,9 @@ export function MarketTabs() {
         tabBarActiveTintColor: colors.coralDark,
         tabBarInactiveTintColor: colors.inkSoft,
         tabBarActiveBackgroundColor: colors.cream,
-        tabBarLabelStyle: styles.mobileLabel,
+        tabBarLabelStyle: [styles.mobileLabel, compact && styles.compactLabel],
         tabBarItemStyle: styles.mobileItem,
-        tabBarStyle: styles.mobileBar,
+        tabBarStyle: [styles.mobileBar, compact && styles.compactBar],
         sceneStyle: styles.scene,
       }}>
       <Tabs.Screen
@@ -67,5 +68,7 @@ const styles = StyleSheet.create({
   },
   mobileItem: { paddingVertical: 2 },
   mobileLabel: { fontFamily: fonts.bold, fontSize: 10 },
+  compactLabel: { fontSize: 9 },
+  compactBar: { height: 64, paddingTop: 5, paddingBottom: 5 },
   badge: { backgroundColor: colors.coral, color: colors.white },
 });

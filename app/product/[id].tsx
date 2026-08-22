@@ -9,7 +9,7 @@ import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice, getCategory, getMarketStatus } from '@/constants/market';
-import { responsive } from '@/constants/responsive';
+import { getPageGutter, responsive } from '@/constants/responsive';
 import { MAX_QUANTITY_PER_LINE, useCart } from '@/store/cart';
 import { useProducts } from '@/store/products';
 
@@ -18,6 +18,7 @@ export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const desktop = Platform.OS === 'web' && width >= 900;
+  const compact = Platform.OS === 'web' && width < 360;
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getProductById } = useProducts();
   const { addToCart, getQuantity, itemCount } = useCart();
@@ -47,8 +48,8 @@ export default function ProductDetailScreen() {
   return (
     <View style={styles.screen}>
       <ModernHeader title={product.name} showBack cartCount={itemCount} onCart={() => router.push('/cart')} onSwitchRole={() => router.replace('/role-selection' as never)} />
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.mediumPage, desktop && styles.contentDesktop, { paddingBottom: insets.bottom + 34 }]}>
-        <View style={[styles.imageWrap, desktop && styles.imageWrapDesktop]}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.mediumPage, desktop && styles.contentDesktop, { paddingHorizontal: getPageGutter(width), paddingBottom: insets.bottom + 34 }]}>
+        <View style={[styles.imageWrap, compact && styles.imageWrapCompact, desktop && styles.imageWrapDesktop]}>
           {product.image ? <Image source={{ uri: product.image }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} /> : <View style={styles.imageFallback}><AppIcon name={category.icon} size={60} color={colors.ink} /></View>}
           <View style={styles.imageBadge}><Text style={styles.imageBadgeText}>{product.isNew ? 'JUST ARRIVED' : category.label.toUpperCase()}</Text></View>
         </View>
@@ -57,7 +58,7 @@ export default function ProductDetailScreen() {
             <View style={styles.tag}><AppIcon name={category.icon} size={14} color={colors.ink} /><Text style={styles.tagText}>{category.label}</Text></View>
             {product.isNew ? <View style={[styles.tag, styles.tagCoral]}><AppIcon name="sparkle" size={14} color={colors.coralDark} /><Text style={styles.tagCoralText}>New</Text></View> : null}
           </View>
-          <Text style={styles.title}>{product.name}</Text>
+          <Text style={[styles.title, compact && styles.titleCompact]}>{product.name}</Text>
           <View style={styles.priceRow}><Text style={styles.price}>{formatPrice(product.price)}</Text><Text style={styles.unit}>per {product.unit}</Text></View>
           {product.weight ? <Text style={styles.weight}>{product.weight}</Text> : null}
           {product.description ? <Text style={styles.description}>{product.description}</Text> : null}
@@ -81,6 +82,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 20, paddingTop: 18, gap: 18 },
   contentDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 28, paddingTop: 32 },
   imageWrap: { height: 330, borderRadius: 18, overflow: 'hidden', backgroundColor: colors.sage, position: 'relative', ...shadow.card },
+  imageWrapCompact: { height: 270, borderRadius: 15 },
   imageWrapDesktop: { width: '48%', height: 540, borderRadius: 20 },
   imageFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   imageBadge: { position: 'absolute', left: 15, top: 15, backgroundColor: 'rgba(255,255,255,0.88)', borderRadius: radii.pill, paddingHorizontal: 10, paddingVertical: 7 },
@@ -93,6 +95,7 @@ const styles = StyleSheet.create({
   tagCoral: { backgroundColor: colors.cream },
   tagCoralText: { color: colors.coralDark, fontFamily: fonts.semibold, fontSize: 11 },
   title: { color: colors.ink, fontFamily: fonts.display, fontSize: 34, lineHeight: 38, letterSpacing: -0.45 },
+  titleCompact: { fontSize: 30, lineHeight: 34 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5 },
   price: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 24 },
   unit: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12 },
