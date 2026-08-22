@@ -1,0 +1,7 @@
+'use strict';
+
+// Compatibility entry point for an existing Render service that still uses
+// `node expo-router/entry` as its configured Start Command. The Expo package
+// entry is for bundling the client app; production must serve the exported
+// `dist` directory over Render's HTTP port instead.
+require('../scripts/serve-render.cjs');
