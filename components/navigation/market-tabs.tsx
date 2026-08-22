@@ -8,7 +8,6 @@
 import { Tabs } from 'expo-router';
 import { useTheme } from 'react-native-paper';
 
-import { HapticTab } from '@/components/haptic-tab';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useCart } from '@/store/cart';
 
@@ -20,7 +19,6 @@ export function MarketTabs() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarButton: HapticTab,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarLabelStyle: { fontSize: 12, fontWeight: '500' },
@@ -40,10 +38,12 @@ export function MarketTabs() {
         }}
       />
       <Tabs.Screen
-        name="add"
+        name="orders"
         options={{
-          title: 'Add sweet',
-          tabBarIcon: ({ color }) => <AppIcon name="addProduct" size={26} color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color, focused }) => (
+            <AppIcon name={focused ? 'checkout' : 'checkout'} size={25} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

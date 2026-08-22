@@ -1,19 +1,18 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 
 import { MarketDarkTheme, MarketLightTheme, NavDarkTheme, NavLightTheme } from '@/constants/theme';
+import { AppStatusBar } from '@/components/ui/app-status-bar';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { CartProvider } from '@/store/cart';
+import { configureNotifications, requestNotificationPermissions } from '@/services/notifications';
 import { ProductsProvider } from '@/store/products';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import '@/global.css';
+import { useEffect } from 'react';
 
 /**
  * Paper renders icons through `react-native-vector-icons` by default, which is
@@ -47,6 +46,11 @@ export default function RootLayout() {
   const paperTheme = isDark ? MarketDarkTheme : MarketLightTheme;
   const navigationTheme = isDark ? NavDarkTheme : NavLightTheme;
 
+  useEffect(() => {
+    configureNotifications();
+    void requestNotificationPermissions();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <PaperProvider theme={paperTheme} settings={paperSettings}>
@@ -55,17 +59,20 @@ export default function RootLayout() {
             <CartProvider>
               {/* Every screen draws its own Material 3 top app bar. */}
               <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="owner" />
+                <Stack.Screen name="courier" />
+                <Stack.Screen name="notifications" />
                 <Stack.Screen name="product/[id]" />
                 <Stack.Screen name="checkout" />
-                <Stack.Screen name="orders" />
                 {/* The confirmation replaces checkout in the stack, so Back
                     from here returns to the market rather than the form. */}
                 <Stack.Screen name="order/[id]" options={{ gestureEnabled: false }} />
               </Stack>
             </CartProvider>
           </ProductsProvider>
-          <StatusBar style={isDark ? 'light' : 'dark'} />
+          <AppStatusBar />
         </ThemeProvider>
       </PaperProvider>
     </SafeAreaProvider>

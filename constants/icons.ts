@@ -24,6 +24,7 @@ export const ICONS = {
   chevronDown: { md: 'chevron-down', sf: 'chevron.down' },
   back: { md: 'arrow-left', sf: 'chevron.backward' },
   close: { md: 'close', sf: 'xmark' },
+  search: { md: 'magnify', sf: 'magnifyingglass' },
 
   cart: { md: 'cart-outline', sf: 'cart' },
   cartFilled: { md: 'cart', sf: 'cart.fill' },
@@ -47,6 +48,7 @@ export const ICONS = {
   checkout: { md: 'clipboard-check-outline', sf: 'list.clipboard' },
   check: { md: 'check', sf: 'checkmark' },
   checkCircle: { md: 'check-circle-outline', sf: 'checkmark.circle' },
+  notifications: { md: 'bell-outline', sf: 'bell' },
 
   person: { md: 'account-outline', sf: 'person' },
   phone: { md: 'phone-outline', sf: 'phone' },

@@ -313,6 +313,7 @@ type State = {
 
 type Action =
   | { type: 'add-product'; product: Product }
+  | { type: 'update-product'; productId: string; updates: Partial<Product> }
   | { type: 'toggle-category'; category: CategoryId }
   | { type: 'clear-categories' };
 
@@ -320,6 +321,13 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'add-product':
       return { ...state, products: [action.product, ...state.products] };
+    case 'update-product':
+      return {
+        ...state,
+        products: state.products.map((product) =>
+          product.id === action.productId ? { ...product, ...action.updates } : product
+        ),
+      };
     case 'toggle-category': {
       const isSelected = state.selectedCategories.includes(action.category);
       return {
@@ -346,6 +354,7 @@ type ProductsContextValue = {
   toggleCategory: (category: CategoryId) => void;
   clearCategories: () => void;
   addProduct: (input: NewProductInput) => Product;
+  updateProduct: (productId: string, updates: Partial<Product>) => void;
   getProductById: (id: string) => Product | undefined;
   countByCategory: Record<CategoryId, number>;
 };
@@ -376,6 +385,10 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     };
     dispatch({ type: 'add-product', product });
     return product;
+  }, []);
+
+  const updateProduct = useCallback((productId: string, updates: Partial<Product>) => {
+    dispatch({ type: 'update-product', productId, updates });
   }, []);
 
   const toggleCategory = useCallback((category: CategoryId) => {
@@ -419,6 +432,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       toggleCategory,
       clearCategories,
       addProduct,
+      updateProduct,
       getProductById,
       countByCategory,
     }),
@@ -430,6 +444,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       toggleCategory,
       clearCategories,
       addProduct,
+      updateProduct,
       getProductById,
       countByCategory,
     ]

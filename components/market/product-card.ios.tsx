@@ -39,7 +39,7 @@ export function ProductCard({ product, onPress }: Props) {
         accessibilityRole="button"
         accessibilityLabel={`${product.name}, ${formatPrice(product.price)}`}
         style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}>
-        <View style={styles.imageWrapper}>
+        <View className="bg-black/5" style={styles.imageWrapper}>
           {showPlaceholder ? (
             <View style={[styles.placeholder, !available && styles.unavailablePlaceholder]}>
               <AppIcon name={category.icon} size={38} color={IOSColors.secondaryLabel} />
@@ -60,7 +60,7 @@ export function ProductCard({ product, onPress }: Props) {
           </View>
         </View>
 
-        <View style={styles.content}>
+        <View className="gap-1" style={styles.content}>
           <Text style={styles.category}>{category.label.toUpperCase()}</Text>
           <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
           {product.weight ? <Text style={styles.weight} numberOfLines={1}>{product.weight}</Text> : null}

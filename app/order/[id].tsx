@@ -1,269 +1,42 @@
-/**
- * Order confirmation, shown after checkout.
- *
- * The cart has already been emptied by this point, so this screen reads the
- * order out of the order history by id.
- */
-
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Divider, Snackbar, Surface, Text, useTheme } from 'react-native-paper';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
 
 import { AppIcon } from '@/components/ui/app-icon';
-import { iconSource } from '@/components/ui/icon-source';
-import { ScreenHeader, useScreenHeaderInset } from '@/components/ui/screen-header';
-import type { IconName } from '@/constants/icons';
-import { formatPrice, getMarketStatus } from '@/constants/market';
+import { GSPressable } from '@/components/ui/gluestack';
+import { ModernHeader } from '@/components/ui/modern-header';
+import { colors, shadow } from '@/constants/design';
+import { formatPrice } from '@/constants/market';
+import { responsive } from '@/constants/responsive';
+import type { DeliveryStatus, OrderStatus } from '@/store/cart';
 import { useCart } from '@/store/cart';
 
-export default function OrderConfirmationScreen() {
-  const theme = useTheme();
+const statusLabels: Record<OrderStatus, string> = { pending: 'Awaiting confirmation', accepted: 'Order confirmed', preparing: 'Being prepared', ready: 'Ready for collection', completed: 'Completed', declined: 'Order declined' };
+const deliveryLabels: Record<DeliveryStatus, string> = { unassigned: 'Waiting for courier', claimed: 'Courier accepted', picked_up: 'Picked up from shop', on_the_way: 'Courier is on the way', delivered: 'Delivered to you' };
+const steps: OrderStatus[] = ['pending', 'accepted', 'preparing', 'ready', 'completed'];
+const getStatusLabel = (status: OrderStatus, fulfillment: 'pickup' | 'delivery') => status === 'ready' && fulfillment === 'delivery' ? 'Ready for courier' : statusLabels[status];
+
+export default function OrderDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const headerInset = useScreenHeaderInset();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getOrderById } = useCart();
-  const [ownerNoticeVisible, setOwnerNoticeVisible] = useState(true);
-
   const order = getOrderById(id);
-  const status = getMarketStatus();
-  // Expo Router's generated route types can lag behind a newly added screen;
-  // the /orders file is a real static route and is registered in the root stack.
-  const openOwnerInbox = () => router.push('/orders' as never);
 
-  if (!order) {
-    return (
-      <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-        <ScreenHeader
-          title="Order"
-          actions={[{ icon: 'close', label: 'Close', onPress: () => router.navigate('/') }]}
-        />
-        <View style={[styles.missing, { paddingTop: headerInset }]}>
-          <Text variant="titleMedium">We could not find that order.</Text>
-          <Button mode="contained-tonal" onPress={() => router.navigate('/')}>
-            Back to the menu
-          </Button>
-        </View>
-      </View>
-    );
-  }
+  if (!order) return <View style={styles.screen}><ModernHeader title="Order" showBack /><View style={styles.empty}><Text style={styles.emptyTitle}>We couldn’t find that order.</Text></View></View>;
+  const activeIndex = steps.indexOf(order.status);
+  const isDeclined = order.status === 'declined';
 
-  const { customer } = order;
-  const placedAt = new Date(order.placedAt);
-
-  return (
-    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <ScreenHeader
-        title="Order confirmed"
-        actions={[
-          {
-            icon: 'close',
-            label: 'Close and return to the menu',
-            onPress: () => router.navigate('/'),
-          },
-        ]}
-      />
-
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: headerInset + 16, paddingBottom: insets.bottom + 32 },
-        ]}>
-        <View style={styles.hero}>
-          <View style={[styles.checkCircle, { backgroundColor: theme.colors.primaryContainer }]}>
-            <AppIcon name="check" size={48} color={theme.colors.onPrimaryContainer} />
-          </View>
-          <Text variant="headlineSmall" style={styles.centered}>
-            Thanks, {customer.name.split(' ')[0]}!
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.centered, { color: theme.colors.onSurfaceVariant }]}>
-            {status.isOpen
-              ? 'Your sweets order is with our kitchen. We will call to confirm it shortly.'
-              : `The shop is closed right now, so we will start your order when it reopens. ${status.message.replace('Closed · ', '')}.`}
-          </Text>
-          <Surface
-            elevation={0}
-            style={[styles.reference, { backgroundColor: theme.colors.secondaryContainer }]}>
-            <Text variant="labelLarge" style={{ color: theme.colors.onSecondaryContainer }}>
-              Order {order.reference}
-            </Text>
-          </Surface>
-        </View>
-
-        {/* ------------------------------ Items ----------------------------- */}
-        <Surface
-          elevation={0}
-          style={[styles.card, { backgroundColor: theme.colors.surfaceVariant }]}>
-          <Text variant="titleMedium">
-            {`${order.itemCount} ${order.itemCount === 1 ? 'item' : 'items'}`}
-          </Text>
-          {order.lines.map((line) => (
-            <View key={line.product.id} style={styles.line}>
-              <Text variant="bodyMedium" style={styles.lineName} numberOfLines={1}>
-                {`${line.quantity} × ${line.product.name}`}
-              </Text>
-              <Text variant="bodyMedium">{formatPrice(line.product.price * line.quantity)}</Text>
-            </View>
-          ))}
-          <Divider style={styles.divider} />
-          <View style={styles.line}>
-            <Text variant="titleMedium">Total</Text>
-            <Text variant="titleLarge" style={{ color: theme.colors.primary }}>
-              {formatPrice(order.total)}
-            </Text>
-          </View>
-        </Surface>
-
-        {/* ----------------------------- Details ---------------------------- */}
-        <Surface
-          elevation={0}
-          style={[styles.card, { backgroundColor: theme.colors.surfaceVariant }]}>
-          <Text variant="titleMedium">
-            {customer.address ? 'Delivery details' : 'Collection details'}
-          </Text>
-
-          <DetailRow icon="person" label="Name" value={customer.name} />
-          <DetailRow icon="phone" label="Phone" value={customer.phone} />
-          <DetailRow
-            icon="address"
-            label={customer.address ? 'Address' : 'Collection'}
-            value={customer.address ?? 'Collect at Nour Sweets'}
-          />
-          <DetailRow
-            icon="clock"
-            label="Placed"
-            value={placedAt.toLocaleString(undefined, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            })}
-          />
-        </Surface>
-
-        <Button
-          mode="contained-tonal"
-          icon={iconSource('checkout')}
-          onPress={openOwnerInbox}
-          contentStyle={styles.ctaContent}
-          style={styles.cta}>
-          Open shop owner inbox
-        </Button>
-
-        <Button
-          mode="contained"
-          icon={iconSource('store')}
-          onPress={() => router.navigate('/')}
-          contentStyle={styles.ctaContent}
-          style={styles.cta}>
-          Back to the menu
-        </Button>
-      </ScrollView>
-
-      <Snackbar
-        visible={ownerNoticeVisible}
-        onDismiss={() => setOwnerNoticeVisible(false)}
-        duration={8000}
-        action={{
-          label: 'View orders',
-          onPress: openOwnerInbox,
-        }}>
-        {`New order ${order.reference} is waiting for approval.`}
-      </Snackbar>
-    </View>
-  );
-}
-
-function DetailRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
-  const theme = useTheme();
-  return (
-    <View style={styles.detailRow}>
-      <AppIcon
-        name={icon}
-        size={20}
-        color={theme.colors.onSurfaceVariant}
-        style={styles.detailIcon}
-      />
-      <View style={styles.detailText}>
-        <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-          {label}
-        </Text>
-        <Text variant="bodyLarge">{value}</Text>
-      </View>
-    </View>
-  );
+  return <View style={styles.screen}><ModernHeader eyebrow="YOUR ORDER" title={order.reference} subtitle={getStatusLabel(order.status, order.fulfillment)} showBack /><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.narrowPage, { paddingBottom: insets.bottom + 28 }]}>
+    <View style={styles.statusCard}><View style={[styles.statusOrb, { backgroundColor: isDeclined ? '#FBE1DE' : colors.sage }]}><AppIcon name={isDeclined ? 'info' : order.status === 'completed' ? 'checkCircle' : 'sparkle'} size={23} color={isDeclined ? colors.danger : colors.ink} /></View><View style={styles.statusCopy}><Text style={styles.statusTitle}>{getStatusLabel(order.status, order.fulfillment)}</Text><Text style={styles.statusText}>{isDeclined ? 'Please reach out to the counter if you need help.' : order.status === 'ready' && order.fulfillment === 'pickup' ? 'Come by whenever it suits you.' : order.status === 'ready' && order.fulfillment === 'delivery' ? 'Your courier can now collect the order.' : 'We’ll keep the sweet progress moving.'}</Text></View></View>
+    {!isDeclined ? <View style={styles.timeline}>{steps.map((step, index) => { const complete = activeIndex >= index; const current = order.status === step; return <View key={step} style={styles.timelineRow}><View style={styles.timelineRail}>{index < steps.length - 1 ? <View style={[styles.rail, complete && styles.railActive]} /> : null}<View style={[styles.stepDot, complete && styles.stepDotActive, current && styles.stepDotCurrent]}>{complete ? <AppIcon name="check" size={11} color={colors.white} /> : null}</View></View><View style={styles.stepCopy}><Text style={[styles.stepTitle, complete && styles.stepTitleActive]}>{getStatusLabel(step, order.fulfillment)}</Text>{current ? <Text style={styles.stepHint}>Current status</Text> : null}</View></View>; })}</View> : null}
+    <View style={styles.deliveryCard}><View style={styles.cardHeader}><Text style={styles.cardTitle}>{order.fulfillment === 'delivery' ? 'Courier progress' : 'Collection plan'}</Text><View style={styles.deliveryPill}><Text style={styles.deliveryPillText}>{order.fulfillment === 'delivery' ? deliveryLabels[order.deliveryStatus ?? 'unassigned'] : 'Pickup at counter'}</Text></View></View>{order.fulfillment === 'delivery' ? <><View style={styles.detailRow}><AppIcon name="address" size={18} color={colors.coralDark} /><Text style={styles.detailText}>{order.courierName ? `${order.courierName} is handling your order.` : 'We are finding a courier for your order.'}</Text></View>{order.courierLocation ? <View style={styles.locationRow}><AppIcon name="address" size={16} color={colors.inkSoft} /><Text style={styles.locationText}>Live location shared · {order.courierLocation.latitude.toFixed(4)}, {order.courierLocation.longitude.toFixed(4)}</Text></View> : null}</> : <View style={styles.detailRow}><AppIcon name="store" size={18} color={colors.inkSoft} /><Text style={styles.detailText}>We&apos;ll notify you when your sweets are ready at Nour Sweets.</Text></View>}</View>
+    <View style={styles.orderCard}><View style={styles.cardHeader}><Text style={styles.cardTitle}>What’s in the box</Text><Text style={styles.cardCount}>{order.itemCount} items</Text></View>{order.lines.map((line) => <View key={line.product.id} style={styles.itemRow}><View style={styles.itemCopy}><Text style={styles.itemName}>{line.quantity} × {line.product.name}</Text><Text style={styles.itemMeta}>{line.product.weight ?? `Per ${line.product.unit}`}</Text></View><Text style={styles.itemPrice}>{formatPrice(line.product.price * line.quantity)}</Text></View>)}<View style={styles.totalRow}><Text style={styles.totalLabel}>Total</Text><Text style={styles.total}>{formatPrice(order.total)}</Text></View></View>
+    <View style={styles.customerCard}><Text style={styles.cardTitle}>Collection details</Text><View style={styles.detailRow}><AppIcon name="person" size={18} color={colors.inkSoft} /><Text style={styles.detailText}>{order.customer.name}</Text></View><View style={styles.detailRow}><AppIcon name="phone" size={18} color={colors.inkSoft} /><Text style={styles.detailText}>{order.customer.phone}</Text></View><View style={styles.detailRow}><AppIcon name={order.customer.address ? 'address' : 'store'} size={18} color={colors.inkSoft} /><Text style={styles.detailText}>{order.customer.address ?? 'Collect at Nour Sweets counter'}</Text></View></View>
+    <GSPressable onPress={() => router.replace('/(tabs)' as never)} style={styles.backButton as never}><Text style={styles.backText}>Back to the counter</Text><AppIcon name="chevronDown" size={16} color={colors.ink} style={styles.arrow} /></GSPressable>
+  </ScrollView></View>;
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-  },
-  missing: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    padding: 24,
-  },
-  hero: {
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 8,
-  },
-  checkCircle: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  centered: {
-    textAlign: 'center',
-  },
-  reference: {
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    marginTop: 4,
-  },
-  card: {
-    borderRadius: 20,
-    padding: 16,
-    gap: 10,
-  },
-  line: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  lineName: {
-    flex: 1,
-  },
-  divider: {
-    marginVertical: 2,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  detailIcon: {
-    marginTop: 4,
-  },
-  detailText: {
-    flex: 1,
-  },
-  cta: {
-    marginTop: 4,
-  },
-  ctaContent: {
-    paddingVertical: 6,
-  },
+  screen: { flex: 1, backgroundColor: colors.paper }, content: { paddingHorizontal: 20, paddingTop: 8, gap: 15 }, empty: { flex: 1, alignItems: 'center', justifyContent: 'center' }, emptyTitle: { color: colors.ink, fontSize: 17, fontWeight: '800' }, statusCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.ink, borderRadius: 23, padding: 16 }, statusOrb: { width: 47, height: 47, borderRadius: 17, alignItems: 'center', justifyContent: 'center' }, statusCopy: { flex: 1, gap: 4 }, statusTitle: { color: colors.white, fontSize: 16, fontWeight: '800' }, statusText: { color: '#B8C9C0', fontSize: 11, lineHeight: 16 }, timeline: { backgroundColor: colors.white, borderRadius: 22, padding: 16, gap: 0, ...shadow.card }, timelineRow: { flexDirection: 'row', minHeight: 46, gap: 12 }, timelineRail: { width: 19, alignItems: 'center', position: 'relative' }, rail: { position: 'absolute', top: 20, bottom: -3, width: 2, backgroundColor: colors.line }, railActive: { backgroundColor: colors.coral }, stepDot: { width: 18, height: 18, borderRadius: 9, backgroundColor: colors.cloud, alignItems: 'center', justifyContent: 'center', zIndex: 1 }, stepDotActive: { backgroundColor: colors.coral }, stepDotCurrent: { borderWidth: 3, borderColor: colors.cream }, stepCopy: { gap: 2, paddingTop: 1 }, stepTitle: { color: colors.inkSoft, fontSize: 12 }, stepTitleActive: { color: colors.ink, fontWeight: '800' }, stepHint: { color: colors.coralDark, fontSize: 9, fontWeight: '800' }, deliveryCard: { backgroundColor: colors.white, borderRadius: 22, padding: 16, gap: 12, ...shadow.card }, deliveryPill: { borderRadius: 999, backgroundColor: colors.sage, paddingHorizontal: 9, paddingVertical: 6 }, deliveryPillText: { color: colors.ink, fontSize: 9, fontWeight: '800' }, locationRow: { flexDirection: 'row', alignItems: 'center', gap: 8 }, locationText: { flex: 1, color: colors.inkSoft, fontSize: 10 }, orderCard: { backgroundColor: colors.white, borderRadius: 22, padding: 16, gap: 13, ...shadow.card }, cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, cardTitle: { color: colors.ink, fontSize: 15, fontWeight: '800' }, cardCount: { color: colors.inkSoft, fontSize: 10 }, itemRow: { flexDirection: 'row', gap: 12, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 11 }, itemCopy: { flex: 1, gap: 3 }, itemName: { color: colors.ink, fontSize: 12, fontWeight: '700' }, itemMeta: { color: colors.inkSoft, fontSize: 10 }, itemPrice: { color: colors.ink, fontSize: 12, fontWeight: '800' }, totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 13, marginTop: 2 }, totalLabel: { color: colors.ink, fontSize: 14, fontWeight: '800' }, total: { color: colors.coralDark, fontSize: 18, fontWeight: '900' }, customerCard: { backgroundColor: colors.white, borderRadius: 22, padding: 16, gap: 12, ...shadow.card }, detailRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 9 }, detailText: { flex: 1, color: colors.inkSoft, fontSize: 12, lineHeight: 17 }, backButton: { height: 50, borderRadius: 16, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }, backText: { color: colors.ink, fontSize: 13, fontWeight: '800' }, arrow: { transform: [{ rotate: '-90deg' }] },
 });

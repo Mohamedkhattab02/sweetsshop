@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+@theme {
+  --color-ink: #172824;
+  --color-paper: #fbfaf7;
+  --color-cream: #fff8f2;
+  --color-coral: #ef7d61;
+  --color-coral-dark: #c95b49;
+  --color-sage: #dcebe3;
+  --color-mint: #c7ddd4;
+  --color-gold: #e3ac63;
+  --color-line: #e6e8e2;
+  --font-display: 'Georgia';
+}
+
+@media (min-width: 768px) {
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background: #f6f3ed;
+  }
+
+  body {
+    margin: 0;
+    overscroll-behavior-y: none;
+    background:
+      radial-gradient(circle at 78% -12%, rgba(239, 125, 97, 0.11), transparent 30rem),
+      radial-gradient(circle at 28% 108%, rgba(199, 221, 212, 0.18), transparent 32rem),
+      #f6f3ed;
+  }
+
+  [role='button'],
+  [role='link'] {
+    cursor: pointer;
+  }
+
+  ::selection {
+    color: #172824;
+    background: #f5d2c7;
+  }
+
+  * {
+    scrollbar-color: #c7d8d0 transparent;
+    scrollbar-width: thin;
+  }
+
+  *:focus-visible {
+    outline: 3px solid rgba(239, 125, 97, 0.42);
+    outline-offset: 3px;
+  }
+}

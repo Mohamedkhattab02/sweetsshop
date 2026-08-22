@@ -30,7 +30,7 @@ export function ProductCard({ product, onPress }: Props) {
 
   return (
     <Card mode="elevated" style={styles.card} onPress={onPress} accessible accessibilityLabel={product.name}>
-      <View style={styles.imageWrapper}>
+      <View className="bg-[#F1E8E1]" style={styles.imageWrapper}>
         {showPlaceholder ? (
           <View style={[styles.placeholder, { backgroundColor: theme.colors.secondaryContainer }]}>
             <AppIcon name={category.icon} size={44} color={theme.colors.onSecondaryContainer} />
@@ -59,7 +59,7 @@ export function ProductCard({ product, onPress }: Props) {
         </View>
       </View>
 
-      <Card.Content style={styles.content}>
+      <Card.Content className="gap-1" style={styles.content}>
         <Text variant="labelSmall" style={{ color: theme.colors.primary }}>
           {category.label.toUpperCase()}
         </Text>
