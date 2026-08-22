@@ -3,7 +3,7 @@ import { StyleSheet, useWindowDimensions } from 'react-native';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { WebNavigation } from '@/components/navigation/web-navigation';
-import { colors } from '@/constants/design';
+import { colors, fonts } from '@/constants/design';
 import { useCart } from '@/store/cart';
 
 export function OwnerTabs() {
@@ -37,6 +37,6 @@ const styles = StyleSheet.create({
   scene: { backgroundColor: colors.paper },
   mobileBar: { height: 68, paddingTop: 7, paddingBottom: 7, backgroundColor: colors.white, borderTopColor: colors.line },
   mobileItem: { paddingVertical: 2 },
-  mobileLabel: { fontSize: 10, fontWeight: '700' },
+  mobileLabel: { fontFamily: fonts.bold, fontSize: 10 },
   badge: { backgroundColor: colors.coral, color: colors.white },
 });

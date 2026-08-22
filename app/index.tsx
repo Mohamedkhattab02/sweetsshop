@@ -1,99 +1,136 @@
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Platform, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '@/components/ui/app-icon';
-import { GSButton, GSPressable } from '@/components/ui/gluestack';
-import { colors, radii, shadow } from '@/constants/design';
+import { GSPressable } from '@/components/ui/gluestack';
+import { colors, fonts, radii, shadow } from '@/constants/design';
+import type { IconName } from '@/constants/icons';
+
+const heroImage = require('@/assets/images/nour-sweets-web-hero-v2.png');
+
+const roles: {
+  title: string;
+  description: string;
+  cta: string;
+  icon: IconName;
+  onPress: 'customer' | 'owner' | 'courier';
+}[] = [
+  {
+    title: 'Shop the counter',
+    description: 'Browse today’s sweets, build a box, and follow your order from the kitchen to you.',
+    cta: 'Enter the shop',
+    icon: 'storeOpen',
+    onPress: 'customer',
+  },
+  {
+    title: 'Manage the shop',
+    description: 'Keep the menu, stock, incoming orders, and daily performance in one focused workspace.',
+    cta: 'Open owner workspace',
+    icon: 'checkout',
+    onPress: 'owner',
+  },
+  {
+    title: 'Deliver an order',
+    description: 'Claim a delivery, share route progress, and make every handoff feel effortless.',
+    cta: 'Open courier desk',
+    icon: 'address',
+    onPress: 'courier',
+  },
+];
 
 export default function RoleSelectionScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const desktop = Platform.OS === 'web' && width >= 960;
+  const desktop = Platform.OS === 'web' && width >= 1040;
 
-  const enterCustomer = () => router.replace('/(tabs)' as never);
-  const enterOwner = () => router.replace('/owner' as never);
-  const enterCourier = () => router.replace('/courier' as never);
+  const enter = (role: 'customer' | 'owner' | 'courier') => {
+    if (role === 'customer') router.replace('/(tabs)' as never);
+    if (role === 'owner') router.replace('/owner' as never);
+    if (role === 'courier') router.replace('/courier' as never);
+  };
 
   return (
     <View style={styles.screen}>
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.paper }]} />
-      <View pointerEvents="none" style={styles.decorOne} />
-      <View pointerEvents="none" style={styles.decorTwo} />
-
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 22, paddingBottom: insets.bottom + 18 }]}
-        showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInUp.duration(700)} style={styles.brandRow}>
-          <View style={styles.brandMark}>
-            <Text style={styles.brandLetter}>N</Text>
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.content,
+          desktop && styles.contentDesktop,
+          { paddingTop: insets.top + (desktop ? 24 : 16), paddingBottom: insets.bottom + 20 },
+        ]}>
+        <Animated.View entering={FadeInUp.duration(520)} style={styles.topbar}>
+          <View style={styles.brandRow}>
+            <View style={styles.brandMark}><Text style={styles.brandLetter}>N</Text></View>
+            <View>
+              <Text style={styles.brand}>NOUR SWEETS</Text>
+              <Text style={styles.brandSub}>Handcrafted joy, made fresh</Text>
+            </View>
           </View>
-          <View>
-            <Text style={styles.brand}>USER SWEETS</Text>
-            <Text style={styles.brandSub}>A little joy, every day</Text>
-          </View>
+          {desktop ? (
+            <View style={styles.openNote}>
+              <View style={styles.liveDot} />
+              <Text style={styles.openText}>The online counter is open</Text>
+            </View>
+          ) : null}
         </Animated.View>
 
         <View style={[styles.main, desktop && styles.mainDesktop]}>
-          <Animated.View entering={FadeInUp.delay(110).duration(700)} style={[styles.intro, desktop && styles.introDesktop]}>
-            <View style={styles.kickerRow}>
-              <View style={styles.kickerLine} />
-              <Text style={styles.kicker}>WELCOME IN</Text>
-            </View>
-            <Text style={[styles.title, desktop && styles.titleDesktop]}>How will you use User Sweets today?</Text>
-            <Text style={[styles.copy, desktop && styles.copyDesktop]}>
-              Choose your space. No sign up, no password — just the experience you need.
-            </Text>
-            {desktop ? (
-              <View style={styles.promiseRow}>
-                <View style={styles.promiseIcon}><AppIcon name="check" size={14} color={colors.ink} /></View>
-                <Text style={styles.promiseText}>One shop, three focused workspaces.</Text>
+          <Animated.View entering={FadeInUp.delay(80).duration(580)} style={[styles.visualPanel, desktop && styles.visualPanelDesktop, shadow.floating]}>
+            <Image
+              source={heroImage}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              accessibilityLabel="A bright counter filled with handcrafted Middle Eastern sweets"
+            />
+            <View style={styles.imageShade} />
+            <View style={styles.visualCopy}>
+              <Text style={styles.visualKicker}>MADE THIS MORNING</Text>
+              <Text style={[styles.visualTitle, desktop && styles.visualTitleDesktop]}>A little celebration,{`\n`}whenever you need one.</Text>
+              <Text style={styles.visualText}>Small-batch sweets, thoughtful boxes, and a smoother way to order.</Text>
+              <View style={styles.proofRow}>
+                <Proof value="20+" label="fresh favorites" />
+                <View style={styles.proofDivider} />
+                <Proof value="3" label="simple workspaces" />
+                <View style={styles.proofDivider} />
+                <Proof value="Live" label="order updates" />
               </View>
-            ) : null}
+            </View>
           </Animated.View>
 
-          <View style={[styles.choices, desktop && styles.choicesDesktop]}>
-          <Animated.View entering={FadeInDown.delay(220).duration(650)} style={styles.choiceWrap}>
-            <RoleCard
-              title="I’m here for sweets"
-              description="Browse the fresh counter, build a box, and follow your order."
-              icon="storeOpen"
-              tone="dark"
-              onPress={enterCustomer}
-              cta="Enter shop"
-            />
+          <Animated.View entering={FadeInDown.delay(130).duration(580)} style={[styles.rolePanel, desktop && styles.rolePanelDesktop]}>
+            <View style={styles.intro}>
+              <Text style={styles.kicker}>CHOOSE YOUR SPACE</Text>
+              <Text style={[styles.title, desktop && styles.titleDesktop]}>How are you joining Nour today?</Text>
+              <Text style={styles.copy}>Each workspace is tailored to the task, with no sign-up or password required.</Text>
+            </View>
+
+            <View style={styles.choices}>
+              {roles.map((role, index) => (
+                <RoleCard key={role.onPress} {...role} primary={index === 0} onSelect={() => enter(role.onPress)} />
+              ))}
+            </View>
+
+            <View style={styles.assurance}>
+              <AppIcon name="checkCircle" size={17} color={colors.coralDark} />
+              <Text style={styles.assuranceText}>Fast, accessible, and designed for every screen.</Text>
+            </View>
           </Animated.View>
-          <Animated.View entering={FadeInDown.delay(320).duration(650)} style={styles.choiceWrap}>
-            <RoleCard
-              title="I run the shop"
-              description="Manage today’s menu, stock, and every order in one place."
-              icon="checkout"
-              tone="light"
-              onPress={enterOwner}
-              cta="Open workspace"
-            />
-          </Animated.View>
-          <Animated.View entering={FadeInDown.delay(420).duration(650)} style={styles.choiceWrap}>
-            <RoleCard
-              title="I deliver the joy"
-              description="Claim delivery orders, share your route, and confirm the handoff."
-              icon="address"
-              tone="light"
-              onPress={enterCourier}
-              cta="Open courier desk"
-            />
-          </Animated.View>
-          </View>
         </View>
-
-        <Animated.View entering={FadeInUp.delay(600).duration(650)} style={styles.footer}>
-          <AppIcon name="sparkle" size={15} color={colors.gold} />
-          <Text style={styles.footerText}>Made for the moments worth sharing</Text>
-        </Animated.View>
       </ScrollView>
+    </View>
+  );
+}
+
+function Proof({ value, label }: { value: string; label: string }) {
+  return (
+    <View style={styles.proof}>
+      <Text style={styles.proofValue}>{value}</Text>
+      <Text style={styles.proofLabel}>{label}</Text>
     </View>
   );
 }
@@ -102,45 +139,34 @@ function RoleCard({
   title,
   description,
   icon,
-  tone,
-  onPress,
   cta,
+  primary,
+  onSelect,
 }: {
   title: string;
   description: string;
-  icon: 'storeOpen' | 'checkout' | 'address';
-  tone: 'dark' | 'light';
-  onPress: () => void;
+  icon: IconName;
   cta: string;
+  primary: boolean;
+  onSelect: () => void;
 }) {
-  const dark = tone === 'dark';
-  const backgroundColor = dark ? colors.ink : colors.white;
-  const textColor = dark ? colors.white : colors.ink;
-  const mutedColor = dark ? '#B8C9C0' : colors.inkSoft;
-
   return (
     <GSPressable
-      onPress={onPress}
+      onPress={onSelect}
       accessibilityRole="button"
       accessibilityLabel={title}
       className="active:opacity-85"
-      style={[styles.roleCard, shadow.card, { backgroundColor }] as never}>
-      <View style={[styles.roleIcon, { backgroundColor: dark ? '#2B4840' : colors.sage }]}>
-        <AppIcon name={icon} size={25} color={dark ? colors.gold : colors.ink} />
+      style={[styles.roleCard, primary && styles.roleCardPrimary] as never}>
+      <View style={[styles.roleIcon, primary && styles.roleIconPrimary]}>
+        <AppIcon name={icon} size={22} color={primary ? colors.white : colors.ink} />
       </View>
       <View style={styles.roleCopy}>
-        <Text style={[styles.roleTitle, { color: textColor }]}>{title}</Text>
-        <Text style={[styles.roleDescription, { color: mutedColor }]}>{description}</Text>
+        <Text style={styles.roleTitle}>{title}</Text>
+        <Text style={styles.roleDescription}>{description}</Text>
+        <Text style={[styles.roleCtaText, primary && styles.roleCtaTextPrimary]}>{cta}</Text>
       </View>
-      <View style={styles.roleFooter}>
-        <GSButton
-          onPress={onPress}
-          className="active:opacity-70"
-          style={[styles.roleCta, { backgroundColor: dark ? colors.coral : colors.ink }] as never}>
-          <GSButton.Text style={styles.roleCtaText}>{cta}</GSButton.Text>
-          <AppIcon name="chevronDown" size={16} color={colors.white} style={styles.arrow} />
-        </GSButton>
-        <AppIcon name="sparkle" size={16} color={dark ? colors.gold : colors.coral} />
+      <View style={[styles.roleAction, primary && styles.roleActionPrimary]}>
+        <AppIcon name="chevronDown" size={16} color={primary ? colors.white : colors.ink} style={styles.arrow} />
       </View>
     </GSPressable>
   );
@@ -149,65 +175,52 @@ function RoleCard({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
   scroll: { flex: 1 },
-  content: { flexGrow: 1, width: '100%', maxWidth: Platform.OS === 'web' ? 1240 : undefined, alignSelf: 'center', paddingHorizontal: Platform.OS === 'web' ? 32 : 22, justifyContent: 'space-between' },
-  decorOne: {
-    position: 'absolute',
-    width: 210,
-    height: 210,
-    borderRadius: 105,
-    backgroundColor: '#F5D9C4',
-    top: -80,
-    right: -70,
-    opacity: 0.45,
-  },
-  decorTwo: {
-    position: 'absolute',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: colors.sage,
-    bottom: -50,
-    left: -70,
-    opacity: 0.65,
-  },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 11 },
-  brandMark: {
-    width: 40,
-    height: 40,
-    borderRadius: 15,
-    backgroundColor: colors.ink,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandLetter: { color: colors.gold, fontFamily: 'Georgia', fontSize: 27, fontWeight: '700' },
-  brand: { color: colors.ink, fontSize: 13, fontWeight: '900', letterSpacing: 2.4 },
-  brandSub: { color: colors.inkSoft, fontSize: 10, marginTop: 2, letterSpacing: 0.5 },
-  main: { flex: 1 },
-  mainDesktop: { flexDirection: 'row', alignItems: 'center', gap: 68, paddingVertical: 48 },
-  intro: { marginTop: 24, gap: 10 },
-  introDesktop: { flex: 0.82, marginTop: 0, paddingRight: 12 },
-  kickerRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
-  kickerLine: { width: 24, height: 2, borderRadius: 1, backgroundColor: colors.coral },
-  kicker: { color: colors.coralDark, fontSize: 11, fontWeight: '900', letterSpacing: 2 },
-  title: { color: colors.ink, fontFamily: 'Georgia', fontSize: 38, lineHeight: 43, fontWeight: '700', letterSpacing: -1 },
-  titleDesktop: { fontSize: 58, lineHeight: 62, letterSpacing: -1.8, maxWidth: 510 },
-  copy: { color: colors.inkSoft, fontSize: 15, lineHeight: 22, maxWidth: 335 },
-  copyDesktop: { fontSize: 17, lineHeight: 27, maxWidth: 470 },
-  promiseRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 14 },
-  promiseIcon: { width: 28, height: 28, borderRadius: 10, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
-  promiseText: { color: colors.ink, fontSize: 12, fontWeight: '700' },
-  choices: { gap: 14, marginTop: 22 },
-  choicesDesktop: { flex: 1.18, marginTop: 0, gap: 12 },
-  choiceWrap: { width: '100%' },
-  roleCard: { borderRadius: radii.card, padding: 17, gap: 15 },
-  roleIcon: { width: 48, height: 48, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
-  roleCopy: { gap: 5 },
-  roleTitle: { fontSize: 19, fontWeight: '800', letterSpacing: -0.3 },
-  roleDescription: { fontSize: 13, lineHeight: 19, maxWidth: 310 },
-  roleFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
-  roleCta: { minHeight: 40, borderRadius: 13, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 9 },
-  roleCtaText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  content: { flexGrow: 1, width: '100%', paddingHorizontal: 20, gap: 18 },
+  contentDesktop: { maxWidth: 1420, alignSelf: 'center', paddingHorizontal: 40, gap: 28 },
+  topbar: { minHeight: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  brandMark: { width: 42, height: 42, borderRadius: 12, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+  brandLetter: { color: colors.white, fontFamily: fonts.display, fontSize: 28, lineHeight: 31 },
+  brand: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 13, letterSpacing: 1.8 },
+  brandSub: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, marginTop: 2 },
+  openNote: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radii.pill, paddingHorizontal: 13, paddingVertical: 9 },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#35A965' },
+  openText: { color: colors.inkSoft, fontFamily: fonts.semibold, fontSize: 11 },
+  main: { flex: 1, gap: 22 },
+  mainDesktop: { flexDirection: 'row', alignItems: 'stretch', minHeight: 680, paddingBottom: 12 },
+  visualPanel: { minHeight: 390, borderRadius: 20, overflow: 'hidden', position: 'relative', backgroundColor: colors.ink },
+  visualPanelDesktop: { flex: 1.05, minHeight: 680 },
+  imageShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(21, 30, 25, 0.18)' },
+  visualCopy: { flex: 1, justifyContent: 'flex-end', padding: 24, gap: 10, maxWidth: 610 },
+  visualKicker: { color: '#F6E7BF', fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.8 },
+  visualTitle: { color: colors.white, fontFamily: fonts.display, fontSize: 35, lineHeight: 39, letterSpacing: -0.5 },
+  visualTitleDesktop: { fontSize: 54, lineHeight: 57, letterSpacing: -1.1 },
+  visualText: { color: '#EEF3EF', fontFamily: fonts.medium, fontSize: 14, lineHeight: 22, maxWidth: 470 },
+  proofRow: { flexDirection: 'row', alignItems: 'stretch', gap: 14, marginTop: 12, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.24)' },
+  proof: { flex: 1, gap: 2 },
+  proofValue: { color: colors.white, fontFamily: fonts.extraBold, fontSize: 18 },
+  proofLabel: { color: '#DCE6E0', fontFamily: fonts.medium, fontSize: 9, lineHeight: 13 },
+  proofDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.2)' },
+  rolePanel: { gap: 20, paddingBottom: 10 },
+  rolePanelDesktop: { flex: 0.95, justifyContent: 'center', paddingHorizontal: 34, paddingVertical: 24 },
+  intro: { gap: 8 },
+  kicker: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.8 },
+  title: { color: colors.ink, fontFamily: fonts.display, fontSize: 36, lineHeight: 40, letterSpacing: -0.5 },
+  titleDesktop: { fontSize: 48, lineHeight: 51, letterSpacing: -0.9 },
+  copy: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 14, lineHeight: 22, maxWidth: 540 },
+  choices: { gap: 10 },
+  roleCard: { minHeight: 118, backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 15, flexDirection: 'row', alignItems: 'center', gap: 13 },
+  roleCardPrimary: { borderColor: colors.coralSoft, backgroundColor: '#FFFBF9' },
+  roleIcon: { width: 46, height: 46, borderRadius: 13, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
+  roleIconPrimary: { backgroundColor: colors.coral },
+  roleCopy: { flex: 1, gap: 4 },
+  roleTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 16, lineHeight: 21 },
+  roleDescription: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11, lineHeight: 17 },
+  roleCtaText: { color: colors.ink, fontFamily: fonts.bold, fontSize: 10, marginTop: 3 },
+  roleCtaTextPrimary: { color: colors.coralDark },
+  roleAction: { width: 38, height: 38, borderRadius: 11, backgroundColor: colors.cloud, alignItems: 'center', justifyContent: 'center' },
+  roleActionPrimary: { backgroundColor: colors.ink },
   arrow: { transform: [{ rotate: '-90deg' }] },
-  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 7, marginTop: 20 },
-  footerText: { color: colors.inkSoft, fontSize: 11, letterSpacing: 0.3 },
+  assurance: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  assuranceText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11 },
 });

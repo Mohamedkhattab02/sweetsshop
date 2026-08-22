@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppIcon } from '@/components/ui/app-icon';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii } from '@/constants/design';
 
 type Props = {
   eyebrow?: string;
@@ -91,31 +91,31 @@ function HeaderAction({ label, icon, count, onPress }: { label: string; icon: 'n
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(251,250,247,0.97)',
+    backgroundColor: colors.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
-    paddingHorizontal: 32,
-    paddingVertical: 12,
+    paddingHorizontal: 40,
+    paddingVertical: 11,
     zIndex: 20,
   },
-  row: { flexDirection: 'row', alignItems: 'center', minHeight: 56, gap: 12, width: '100%', maxWidth: 1240, alignSelf: 'center' },
-  rowDesktop: { minHeight: 66 },
-  logoButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 16 },
-  logoMark: { width: 40, height: 40, borderRadius: 14, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', minHeight: 56, gap: 13, width: '100%', maxWidth: 1360, alignSelf: 'center' },
+  rowDesktop: { minHeight: 64 },
+  logoButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12 },
+  logoMark: { width: 40, height: 40, borderRadius: 11, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
   backMark: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
-  logoLetter: { color: colors.gold, fontFamily: 'Georgia', fontSize: 26, lineHeight: 29, fontWeight: '700' },
+  logoLetter: { color: colors.white, fontFamily: fonts.display, fontSize: 27, lineHeight: 30 },
   heading: { flex: 1, gap: 1, minWidth: 0 },
-  eyebrow: { color: colors.coralDark, fontSize: 9, fontWeight: '900', letterSpacing: 1.7, textTransform: 'uppercase' },
-  title: { color: colors.ink, fontSize: 19, fontWeight: '800', letterSpacing: -0.4 },
-  titleDesktop: { fontSize: 24, letterSpacing: -0.7 },
-  subtitle: { color: colors.inkSoft, fontSize: 11, marginTop: 2 },
+  eyebrow: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 9, letterSpacing: 1.8, textTransform: 'uppercase' },
+  title: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 19, letterSpacing: -0.35 },
+  titleDesktop: { fontSize: 24, letterSpacing: -0.65 },
+  subtitle: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11, marginTop: 2 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  iconButton: { width: 44, height: 44, borderRadius: 15, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center', position: 'relative', ...shadow.card },
-  buttonHovered: { backgroundColor: colors.cream, borderColor: '#E8C7BB' },
+  iconButton: { width: 42, height: 42, borderRadius: 12, backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  buttonHovered: { backgroundColor: colors.cream, borderColor: colors.coralSoft },
   buttonPressed: { opacity: 0.72, transform: [{ scale: 0.97 }] },
-  count: { position: 'absolute', top: -4, right: -4, minWidth: 19, height: 19, paddingHorizontal: 4, borderRadius: 10, backgroundColor: colors.coral, borderWidth: 2, borderColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
-  countText: { color: colors.white, fontSize: 9, fontWeight: '900' },
-  switchButton: { minHeight: 43, borderRadius: radii.pill, backgroundColor: colors.cream, borderWidth: 1, borderColor: '#F1D9D0', paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 7 },
-  switchButtonHovered: { backgroundColor: '#FBE8E1', borderColor: '#E8B8A8' },
-  switchText: { color: colors.coralDark, fontSize: 10, fontWeight: '900' },
+  count: { position: 'absolute', top: -4, right: -4, minWidth: 19, height: 19, paddingHorizontal: 4, borderRadius: 10, backgroundColor: colors.coral, borderWidth: 2, borderColor: colors.white, alignItems: 'center', justifyContent: 'center' },
+  countText: { color: colors.white, fontFamily: fonts.extraBold, fontSize: 9 },
+  switchButton: { minHeight: 42, borderRadius: radii.button, backgroundColor: colors.cream, borderWidth: 1, borderColor: colors.coralSoft, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 7 },
+  switchButtonHovered: { backgroundColor: colors.coralSoft, borderColor: '#E9B5A7' },
+  switchText: { color: colors.coralDark, fontFamily: fonts.bold, fontSize: 10 },
 });

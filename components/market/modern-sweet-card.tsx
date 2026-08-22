@@ -4,7 +4,7 @@ import { Platform, StyleSheet, Text, View, useWindowDimensions, type GestureResp
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice, getCategory } from '@/constants/market';
 import { useCart } from '@/store/cart';
 import type { Product } from '@/store/products';
@@ -102,7 +102,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     borderRadius: radii.card,
-    padding: 8,
+    padding: 7,
+    borderWidth: 1,
+    borderColor: colors.line,
     overflow: 'hidden',
   },
   compactCard: {
@@ -110,14 +112,15 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cardHovered: {
-    transform: [{ translateY: -5 }],
-    shadowOpacity: 0.16,
-    shadowRadius: 28,
-    shadowOffset: { width: 0, height: 16 },
+    transform: [{ translateY: -4 }],
+    borderColor: colors.coralSoft,
+    shadowOpacity: 0.11,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 13 },
   },
   imageWrap: {
-    aspectRatio: 1.06,
-    borderRadius: 20,
+    aspectRatio: 1.08,
+    borderRadius: 13,
     overflow: 'hidden',
     backgroundColor: colors.cloud,
     position: 'relative',
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: colors.white,
     fontSize: 9,
-    fontWeight: '800',
+    fontFamily: fonts.extraBold,
     letterSpacing: 0.8,
   },
   addButton: {
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: colors.ink,
+    backgroundColor: colors.coral,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
   countText: {
     color: colors.white,
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: fonts.extraBold,
   },
   content: {
     paddingHorizontal: 5,
@@ -184,14 +187,14 @@ const styles = StyleSheet.create({
   category: {
     color: colors.inkSoft,
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
   },
   name: {
     color: colors.ink,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: fonts.bold,
     lineHeight: 20,
     minHeight: 40,
     marginTop: 4,
@@ -204,10 +207,11 @@ const styles = StyleSheet.create({
   price: {
     color: colors.coralDark,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: fonts.extraBold,
   },
   unit: {
     color: colors.inkSoft,
+    fontFamily: fonts.medium,
     fontSize: 11,
     marginLeft: 3,
   },

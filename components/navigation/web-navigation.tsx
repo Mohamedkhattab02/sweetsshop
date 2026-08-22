@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AppIcon } from '@/components/ui/app-icon';
-import { colors } from '@/constants/design';
+import { colors, fonts, radii } from '@/constants/design';
 import type { IconName } from '@/constants/icons';
 
 type Props = BottomTabBarProps & {
@@ -35,8 +35,8 @@ export function WebNavigation({ state, descriptors, navigation, mode, badges = {
       <View style={styles.brandBlock}>
         <View style={styles.brandMark}><Text style={styles.brandLetter}>N</Text></View>
         <View>
-          <Text style={styles.brandName}>USER SWEETS</Text>
-          <Text style={styles.brandTagline}>Made to share</Text>
+          <Text style={styles.brandName}>NOUR SWEETS</Text>
+          <Text style={styles.brandTagline}>Made fresh, made to share</Text>
         </View>
       </View>
 
@@ -72,7 +72,7 @@ export function WebNavigation({ state, descriptors, navigation, mode, badges = {
                 pressed && styles.navItemPressed,
               ]}>
               <View style={[styles.navIcon, focused && styles.navIconActive]}>
-                <AppIcon name={icons[route.name] ?? 'store'} size={20} color={focused ? colors.ink : '#AFC1B8'} />
+                <AppIcon name={icons[route.name] ?? 'store'} size={20} color={focused ? colors.white : colors.inkSoft} />
               </View>
               <Text style={[styles.navText, focused && styles.navTextActive]}>{label}</Text>
               {badge > 0 ? <View style={styles.badge}><Text style={styles.badgeText}>{badge}</Text></View> : null}
@@ -95,7 +95,7 @@ export function WebNavigation({ state, descriptors, navigation, mode, badges = {
             <Text style={styles.switchLabel}>Switch workspace</Text>
             <Text style={styles.switchHint}>Customer · Owner · Courier</Text>
           </View>
-          <AppIcon name="chevronDown" size={15} color="#AFC1B8" style={styles.arrow} />
+          <AppIcon name="chevronDown" size={15} color={colors.inkSoft} style={styles.arrow} />
         </Pressable>
       </View>
     </View>
@@ -104,46 +104,46 @@ export function WebNavigation({ state, descriptors, navigation, mode, badges = {
 
 const styles = StyleSheet.create({
   sidebar: {
-    width: 252,
+    width: 264,
     height: '100%',
-    backgroundColor: colors.ink,
-    paddingHorizontal: 18,
-    paddingTop: 24,
-    paddingBottom: 20,
+    backgroundColor: colors.white,
+    paddingHorizontal: 16,
+    paddingTop: 22,
+    paddingBottom: 18,
     borderRightWidth: 1,
-    borderRightColor: '#29423B',
+    borderRightColor: colors.line,
   },
   brandBlock: { flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 6 },
-  brandMark: { width: 42, height: 42, borderRadius: 15, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
-  brandLetter: { color: colors.coralDark, fontFamily: 'Georgia', fontSize: 27, fontWeight: '700' },
-  brandName: { color: colors.white, fontSize: 12, fontWeight: '900', letterSpacing: 1.7 },
-  brandTagline: { color: '#91A69C', fontSize: 9, marginTop: 3, letterSpacing: 0.4 },
-  contextCard: { backgroundColor: '#213B34', borderRadius: 20, padding: 15, marginTop: 26, gap: 5, borderWidth: 1, borderColor: '#315047' },
-  contextLabel: { color: colors.gold, fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
-  contextTitle: { color: colors.white, fontSize: 15, fontWeight: '800' },
+  brandMark: { width: 42, height: 42, borderRadius: 11, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+  brandLetter: { color: colors.white, fontFamily: fonts.display, fontSize: 28 },
+  brandName: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 12, letterSpacing: 1.7 },
+  brandTagline: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 8, marginTop: 3, letterSpacing: 0.2 },
+  contextCard: { backgroundColor: colors.paper, borderRadius: radii.card, padding: 14, marginTop: 24, gap: 5, borderWidth: 1, borderColor: colors.line },
+  contextLabel: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 8, letterSpacing: 1.4 },
+  contextTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 15 },
   openRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 5 },
-  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#7BD495' },
-  openText: { color: '#B9D2C6', fontSize: 10, fontWeight: '700' },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#35A965' },
+  openText: { color: colors.inkSoft, fontFamily: fonts.semibold, fontSize: 10 },
   navigation: { gap: 7, marginTop: 30 },
-  navigationLabel: { color: '#71887D', fontSize: 8, fontWeight: '900', letterSpacing: 1.5, marginLeft: 11, marginBottom: 3 },
-  navItem: { minHeight: 54, borderRadius: 17, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 11 },
-  navItemActive: { backgroundColor: colors.white },
-  navItemHovered: { backgroundColor: '#213B34' },
+  navigationLabel: { color: colors.inkSoft, fontFamily: fonts.extraBold, fontSize: 8, letterSpacing: 1.5, marginLeft: 11, marginBottom: 3 },
+  navItem: { minHeight: 52, borderRadius: 13, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 11 },
+  navItemActive: { backgroundColor: colors.ink },
+  navItemHovered: { backgroundColor: colors.cloud },
   navItemPressed: { opacity: 0.75 },
-  navIcon: { width: 34, height: 34, borderRadius: 12, backgroundColor: '#244139', alignItems: 'center', justifyContent: 'center' },
-  navIconActive: { backgroundColor: colors.sage },
-  navText: { flex: 1, color: '#C4D2CB', fontSize: 12, fontWeight: '700' },
-  navTextActive: { color: colors.ink, fontWeight: '900' },
+  navIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: colors.cloud, alignItems: 'center', justifyContent: 'center' },
+  navIconActive: { backgroundColor: colors.coral },
+  navText: { flex: 1, color: colors.inkSoft, fontFamily: fonts.semibold, fontSize: 12 },
+  navTextActive: { color: colors.white, fontFamily: fonts.bold },
   badge: { minWidth: 21, height: 21, borderRadius: 11, paddingHorizontal: 5, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.coral },
-  badgeText: { color: colors.white, fontSize: 9, fontWeight: '900' },
+  badgeText: { color: colors.white, fontFamily: fonts.extraBold, fontSize: 9 },
   sidebarFooter: { marginTop: 'auto', gap: 12 },
   footerNote: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10 },
-  footerNoteText: { color: '#8FA49A', fontSize: 10 },
-  switchButton: { minHeight: 62, borderRadius: 18, backgroundColor: '#213B34', borderWidth: 1, borderColor: '#315047', padding: 10, flexDirection: 'row', alignItems: 'center', gap: 9 },
-  switchButtonHovered: { backgroundColor: '#29483F', borderColor: '#3D6055' },
-  switchIcon: { width: 34, height: 34, borderRadius: 12, backgroundColor: colors.gold, alignItems: 'center', justifyContent: 'center' },
+  footerNoteText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 9 },
+  switchButton: { minHeight: 62, borderRadius: 14, backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  switchButtonHovered: { backgroundColor: colors.cream, borderColor: colors.coralSoft },
+  switchIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: colors.goldSoft, alignItems: 'center', justifyContent: 'center' },
   switchCopy: { flex: 1, gap: 2 },
-  switchLabel: { color: colors.white, fontSize: 11, fontWeight: '800' },
-  switchHint: { color: '#91A69C', fontSize: 8 },
+  switchLabel: { color: colors.ink, fontFamily: fonts.bold, fontSize: 11 },
+  switchHint: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 8 },
   arrow: { transform: [{ rotate: '-90deg' }] },
 });

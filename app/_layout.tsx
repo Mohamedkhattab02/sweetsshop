@@ -1,13 +1,21 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
+import {
+  Manrope_400Regular,
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from '@expo-google-fonts/manrope';
+import { useFonts } from 'expo-font';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 
-import { MarketDarkTheme, MarketLightTheme, NavDarkTheme, NavLightTheme } from '@/constants/theme';
+import { MarketLightTheme, NavLightTheme } from '@/constants/theme';
 import { AppStatusBar } from '@/components/ui/app-status-bar';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { CartProvider } from '@/store/cart';
 import { configureNotifications, requestNotificationPermissions } from '@/services/notifications';
 import { ProductsProvider } from '@/store/products';
@@ -41,15 +49,23 @@ const paperSettings = {
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const paperTheme = isDark ? MarketDarkTheme : MarketLightTheme;
-  const navigationTheme = isDark ? NavDarkTheme : NavLightTheme;
+  const [fontsLoaded, fontError] = useFonts({
+    DMSerifDisplay_400Regular,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
+  });
+  const paperTheme = MarketLightTheme;
+  const navigationTheme = NavLightTheme;
 
   useEffect(() => {
     configureNotifications();
     void requestNotificationPermissions();
   }, []);
+
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <SafeAreaProvider>

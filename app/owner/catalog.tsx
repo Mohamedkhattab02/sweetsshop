@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice, getCategory } from '@/constants/market';
 import { responsive } from '@/constants/responsive';
 import { useProducts, type Product } from '@/store/products';
@@ -45,41 +45,41 @@ function ProductRow({ product, onUpdate }: { product: Product; onUpdate: (id: st
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 15 },
+  content: { paddingHorizontal: 20, paddingTop: 22, gap: 16 },
   actionRow: { flexDirection: 'row', gap: 10 },
-  search: { flex: 1, height: 50, backgroundColor: colors.cloud, borderRadius: 16, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, gap: 8 },
-  searchInput: { flex: 1, color: colors.ink, fontSize: 13, height: 50 },
-  addButton: { width: 50, height: 50, borderRadius: 16, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
+  search: { flex: 1, height: 52, backgroundColor: colors.white, borderRadius: radii.input, borderWidth: 1, borderColor: colors.line, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, gap: 8 },
+  searchInput: { flex: 1, color: colors.ink, fontFamily: fonts.medium, fontSize: 13, height: 52 },
+  addButton: { width: 52, height: 52, borderRadius: radii.button, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center' },
   filters: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   filterPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.white, borderRadius: radii.pill, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 11, paddingVertical: 8 },
   filterSelected: { backgroundColor: colors.ink, borderColor: colors.ink },
-  filterText: { color: colors.coralDark, fontSize: 11, fontWeight: '800' },
+  filterText: { color: colors.coralDark, fontFamily: fonts.bold, fontSize: 11 },
   filterTextSelected: { color: colors.white },
-  resultCount: { color: colors.inkSoft, fontSize: 11 },
-  insight: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.cream, borderRadius: 18, padding: 12 },
+  resultCount: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11 },
+  insight: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.cream, borderRadius: 14, borderWidth: 1, borderColor: colors.coralSoft, padding: 12 },
   insightIcon: { width: 33, height: 33, borderRadius: 12, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
   insightCopy: { flex: 1, gap: 2 },
-  insightTitle: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  insightText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
+  insightTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  insightText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
   list: { gap: 10 },
   listDesktop: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'stretch', gap: 12 },
   productCell: { width: '48%', flexGrow: 1 },
-  productRow: { backgroundColor: colors.white, borderRadius: 20, padding: 10, flexDirection: 'row', gap: 11, alignItems: 'center', ...shadow.card },
-  thumb: { width: 68, height: 74, borderRadius: 15, backgroundColor: colors.sage },
+  productRow: { backgroundColor: colors.white, borderRadius: 15, borderWidth: 1, borderColor: colors.line, padding: 10, flexDirection: 'row', gap: 11, alignItems: 'center', ...shadow.card },
+  thumb: { width: 72, height: 76, borderRadius: 11, backgroundColor: colors.sage },
   productCopy: { flex: 1, gap: 4 },
-  productName: { color: colors.ink, fontSize: 13, fontWeight: '800' },
-  productCategory: { color: colors.inkSoft, fontSize: 10 },
+  productName: { color: colors.ink, fontFamily: fonts.bold, fontSize: 13 },
+  productCategory: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10 },
   stockLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 3 },
-  stockLabel: { color: colors.inkSoft, fontSize: 10 },
-  stockLow: { color: colors.coralDark, fontWeight: '800' },
+  stockLabel: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10 },
+  stockLow: { color: colors.coralDark, fontFamily: fonts.bold },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   stockButton: { width: 24, height: 24, borderRadius: 8, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   stockPlus: { backgroundColor: colors.ink, borderColor: colors.ink },
   productActions: { alignItems: 'center', gap: 1 },
-  availability: { fontSize: 9, fontWeight: '800' },
+  availability: { fontFamily: fonts.bold, fontSize: 9 },
   available: { color: colors.ink },
   soldOut: { color: colors.coralDark },
   empty: { backgroundColor: colors.white, borderRadius: 22, padding: 25, alignItems: 'center', gap: 6 },
-  emptyTitle: { color: colors.ink, fontSize: 15, fontWeight: '800' },
-  emptyText: { color: colors.inkSoft, fontSize: 12, textAlign: 'center' },
+  emptyTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 15 },
+  emptyText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12, textAlign: 'center' },
 });

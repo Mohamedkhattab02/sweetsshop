@@ -3,7 +3,7 @@ import { StyleSheet, useWindowDimensions } from 'react-native';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { WebNavigation } from '@/components/navigation/web-navigation';
-import { colors } from '@/constants/design';
+import { colors, fonts } from '@/constants/design';
 import { useCart } from '@/store/cart';
 
 export function MarketTabs() {
@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
     borderTopColor: colors.line,
   },
   mobileItem: { paddingVertical: 2 },
-  mobileLabel: { fontSize: 10, fontWeight: '700' },
+  mobileLabel: { fontFamily: fonts.bold, fontSize: 10 },
   badge: { backgroundColor: colors.coral, color: colors.white },
 });

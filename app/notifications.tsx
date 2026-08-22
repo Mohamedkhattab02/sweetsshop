@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { responsive } from '@/constants/responsive';
 import { type NotificationAudience, useCart } from '@/store/cart';
 
@@ -42,19 +42,19 @@ export default function NotificationsScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 11 },
-  notification: { flexDirection: 'row', gap: 11, backgroundColor: colors.white, borderRadius: 19, padding: 14 },
+  content: { paddingHorizontal: 20, paddingTop: 22, gap: 11 },
+  notification: { flexDirection: 'row', gap: 11, backgroundColor: colors.white, borderRadius: 15, borderWidth: 1, borderColor: colors.line, padding: 15 },
   notificationIcon: { width: 38, height: 38, borderRadius: 14, backgroundColor: colors.cream, alignItems: 'center', justifyContent: 'center' },
   notificationCopy: { flex: 1, gap: 3 },
-  notificationTitle: { color: colors.ink, fontSize: 13, fontWeight: '800' },
-  notificationMessage: { color: colors.inkSoft, fontSize: 11, lineHeight: 16 },
-  notificationTime: { color: colors.coralDark, fontSize: 9, fontWeight: '700', marginTop: 3 },
-  empty: { alignItems: 'center', backgroundColor: colors.white, borderRadius: 23, padding: 30, gap: 9, ...shadow.card },
+  notificationTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 13 },
+  notificationMessage: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11, lineHeight: 16 },
+  notificationTime: { color: colors.coralDark, fontFamily: fonts.semibold, fontSize: 9, marginTop: 3 },
+  empty: { alignItems: 'center', backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 30, gap: 9, ...shadow.card },
   emptyIcon: { width: 58, height: 58, borderRadius: 20, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
-  emptyTitle: { color: colors.ink, fontSize: 18, fontWeight: '800' },
-  emptyText: { color: colors.inkSoft, fontSize: 12 },
-  syncCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.sage, borderRadius: 15, padding: 12, marginTop: 6 },
-  syncText: { flex: 1, color: colors.ink, fontSize: 10, lineHeight: 15 },
+  emptyTitle: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 18 },
+  emptyText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12 },
+  syncCard: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.sage, borderRadius: 13, padding: 12, marginTop: 6 },
+  syncText: { flex: 1, color: colors.ink, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
   backWrap: { alignItems: 'center', padding: 8 },
-  backText: { color: colors.coralDark, fontSize: 11, fontWeight: '800' },
+  backText: { color: colors.coralDark, fontFamily: fonts.bold, fontSize: 11 },
 });

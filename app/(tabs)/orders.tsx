@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice } from '@/constants/market';
 import { responsive } from '@/constants/responsive';
 import type { DeliveryStatus, Order, OrderStatus } from '@/store/cart';
@@ -119,32 +119,32 @@ function OrderCard({ order, onPress }: { order: Order; onPress: () => void }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, paddingTop: 9, gap: 15 },
-  heroCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.ink, borderRadius: 23, padding: 16 },
+  content: { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
+  heroCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.ink, borderRadius: 18, padding: 18 },
   heroIcon: { width: 44, height: 44, borderRadius: 16, backgroundColor: '#2B4840', alignItems: 'center', justifyContent: 'center' },
   heroCopy: { flex: 1, gap: 3 },
-  heroTitle: { color: colors.white, fontSize: 15, fontWeight: '800' },
-  heroText: { color: '#B8C9C0', fontSize: 12, lineHeight: 17 },
-  emptyCard: { alignItems: 'center', backgroundColor: colors.white, borderRadius: 26, padding: 28, gap: 10, ...shadow.card },
+  heroTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 15 },
+  heroText: { color: '#C5D2CB', fontFamily: fonts.medium, fontSize: 12, lineHeight: 18 },
+  emptyCard: { alignItems: 'center', backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 30, gap: 10, ...shadow.card },
   emptyIcon: { width: 60, height: 60, borderRadius: 22, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center', marginBottom: 5 },
-  emptyTitle: { color: colors.ink, fontSize: 19, fontWeight: '800', textAlign: 'center' },
-  emptyText: { color: colors.inkSoft, fontSize: 13, lineHeight: 19, textAlign: 'center', maxWidth: 270 },
-  primaryButton: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.coral, borderRadius: 14, paddingHorizontal: 15, paddingVertical: 12, marginTop: 6 },
-  primaryButtonText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  emptyTitle: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 19, textAlign: 'center' },
+  emptyText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 13, lineHeight: 20, textAlign: 'center', maxWidth: 290 },
+  primaryButton: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.coral, borderRadius: radii.button, paddingHorizontal: 15, paddingVertical: 12, marginTop: 6 },
+  primaryButtonText: { color: colors.white, fontFamily: fonts.bold, fontSize: 12 },
   arrow: { transform: [{ rotate: '-90deg' }] },
   list: { gap: 11 },
   listHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
-  sectionTitle: { color: colors.ink, fontSize: 21, fontWeight: '800' },
-  count: { color: colors.inkSoft, fontSize: 11 },
-  orderCard: { backgroundColor: colors.white, borderRadius: 21, padding: 15, gap: 15 },
+  sectionTitle: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 22 },
+  count: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11 },
+  orderCard: { backgroundColor: colors.white, borderRadius: radii.card, borderWidth: 1, borderColor: colors.line, padding: 16, gap: 15 },
   orderTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
-  reference: { color: colors.ink, fontSize: 15, fontWeight: '800' },
-  date: { color: colors.inkSoft, fontSize: 11, marginTop: 3 },
+  reference: { color: colors.ink, fontFamily: fonts.bold, fontSize: 15 },
+  date: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11, marginTop: 3 },
   statusPill: { borderRadius: radii.pill, paddingHorizontal: 9, paddingVertical: 6, maxWidth: 145 },
-  statusText: { fontSize: 10, fontWeight: '800', textAlign: 'center' },
+  statusText: { fontFamily: fonts.bold, fontSize: 10, textAlign: 'center' },
   orderBottom: { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 12 },
-  itemsText: { color: colors.inkSoft, fontSize: 12, flex: 1 },
-  total: { color: colors.coralDark, fontSize: 14, fontWeight: '800' },
+  itemsText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12, flex: 1 },
+  total: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 14 },
   deliveryRow: { flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: colors.cream, borderRadius: 11, paddingHorizontal: 9, paddingVertical: 8 },
-  deliveryText: { color: colors.inkSoft, fontSize: 10, flex: 1 },
+  deliveryText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, flex: 1 },
 });

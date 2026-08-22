@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice } from '@/constants/market';
 import { responsive } from '@/constants/responsive';
 import { useCart } from '@/store/cart';
@@ -24,7 +24,7 @@ export default function OwnerDashboardScreen() {
 
   return (
     <View style={styles.screen}>
-      <ModernHeader eyebrow="OWNER WORKSPACE" title="Good morning, User" subtitle="Here’s the sweet little picture today" notificationCount={unreadNotificationCount('owner')} onNotifications={() => router.push('/notifications?audience=owner' as never)} onSwitchRole={() => router.replace('/role-selection' as never)} />
+      <ModernHeader eyebrow="OWNER WORKSPACE" title="Good morning" subtitle="Your shop, stock, and order flow in one clear view" notificationCount={unreadNotificationCount('owner')} onNotifications={() => router.push('/notifications?audience=owner' as never)} onSwitchRole={() => router.replace('/role-selection' as never)} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[styles.content, responsive.page, { paddingBottom: insets.bottom + 28 }]}>
         <View style={[styles.overviewGrid, desktop && styles.overviewGridDesktop]}>
         <Animated.View entering={FadeInUp.duration(600)} style={[styles.missionCard, desktop && styles.missionCardDesktop]}>
@@ -83,58 +83,58 @@ function RecentOrder({ reference, customer, total, status, onPress }: { referenc
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 18 },
+  content: { paddingHorizontal: 20, paddingTop: 22, gap: 22 },
   overviewGrid: { gap: 18 },
   overviewGridDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 22, paddingTop: 16 },
-  missionCard: { backgroundColor: colors.ink, borderRadius: 25, padding: 19, gap: 9, ...shadow.floating },
-  missionCardDesktop: { flex: 0.72, minHeight: 325, justifyContent: 'flex-end', padding: 28, borderRadius: 29 },
+  missionCard: { backgroundColor: colors.ink, borderRadius: 18, padding: 20, gap: 9, ...shadow.floating },
+  missionCardDesktop: { flex: 0.72, minHeight: 325, justifyContent: 'flex-end', padding: 30, borderRadius: 20 },
   pulseColumn: { gap: 18 },
   pulseColumnDesktop: { flex: 1.28 },
   missionTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   statusPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#2B4840', borderRadius: radii.pill, paddingHorizontal: 9, paddingVertical: 6 },
   liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#9DE4AD' },
-  statusText: { color: '#D3E9DA', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
-  missionTitle: { color: colors.white, fontFamily: 'Georgia', fontSize: 29, lineHeight: 31, fontWeight: '700', marginTop: 8, letterSpacing: -0.5 },
-  missionTitleDesktop: { fontSize: 39, lineHeight: 41, letterSpacing: -1.1 },
-  missionSub: { color: '#B8C9C0', fontSize: 12, marginBottom: 4 },
-  missionButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.gold, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 10 },
-  missionButtonText: { color: colors.ink, fontSize: 11, fontWeight: '800' },
+  statusText: { color: '#D3E9DA', fontFamily: fonts.extraBold, fontSize: 9, letterSpacing: 1 },
+  missionTitle: { color: colors.white, fontFamily: fonts.display, fontSize: 30, lineHeight: 33, marginTop: 8, letterSpacing: -0.35 },
+  missionTitleDesktop: { fontSize: 40, lineHeight: 42, letterSpacing: -0.7 },
+  missionSub: { color: '#C3D0CA', fontFamily: fonts.medium, fontSize: 12, marginBottom: 4 },
+  missionButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.gold, borderRadius: radii.button, paddingHorizontal: 13, paddingVertical: 11 },
+  missionButtonText: { color: colors.ink, fontFamily: fonts.bold, fontSize: 11 },
   arrow: { transform: [{ rotate: '-90deg' }] },
   sectionHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 1 },
-  kicker: { color: colors.coralDark, fontSize: 10, fontWeight: '900', letterSpacing: 1.4, marginBottom: 4 },
-  title: { color: colors.ink, fontSize: 22, fontWeight: '800', letterSpacing: -0.5 },
-  timestamp: { color: colors.inkSoft, fontSize: 10, paddingBottom: 3 },
+  kicker: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.5, marginBottom: 4 },
+  title: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 22, letterSpacing: -0.5 },
+  timestamp: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, paddingBottom: 3 },
   metricsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 11 },
-  metric: { width: Platform.OS === 'web' ? '47%' : '48%', flexGrow: 1, minHeight: 127, backgroundColor: colors.white, borderRadius: 20, padding: 13, ...shadow.card },
+  metric: { width: Platform.OS === 'web' ? '47%' : '48%', flexGrow: 1, minHeight: 127, backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.line, padding: 14, ...shadow.card },
   metricIcon: { width: 33, height: 33, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 9 },
-  metricLabel: { color: colors.inkSoft, fontSize: 11 },
-  metricValue: { color: colors.ink, fontSize: 23, fontWeight: '900', marginTop: 2 },
-  metricHelper: { color: colors.inkSoft, fontSize: 10, marginTop: 2 },
-  attentionCard: { flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: colors.sage, borderRadius: 20, padding: 13 },
+  metricLabel: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11 },
+  metricValue: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 23, marginTop: 2 },
+  metricHelper: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, marginTop: 2 },
+  attentionCard: { flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: colors.sage, borderRadius: 14, padding: 13 },
   attentionHot: { backgroundColor: colors.cream },
   attentionIcon: { width: 39, height: 39, borderRadius: 14, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
   attentionCopy: { flex: 1, gap: 3 },
-  attentionTitle: { color: colors.ink, fontSize: 13, fontWeight: '800' },
-  attentionText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
+  attentionTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 13 },
+  attentionText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
   attentionArrow: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
   lowerGrid: { gap: 18 },
   lowerGridDesktop: { flexDirection: 'row', alignItems: 'flex-start', gap: 22 },
   shortcutColumn: { flex: 0.82, gap: 12 },
   ordersColumn: { flex: 1.18, gap: 10 },
   quickGrid: { flexDirection: 'row', gap: 10 },
-  quickAction: { flex: 1, minHeight: 112, backgroundColor: colors.white, borderRadius: 19, padding: 11, ...shadow.card },
+  quickAction: { flex: 1, minHeight: 112, backgroundColor: colors.white, borderRadius: 15, borderWidth: 1, borderColor: colors.line, padding: 12, ...shadow.card },
   quickIcon: { width: 32, height: 32, borderRadius: 11, backgroundColor: colors.cream, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  quickLabel: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  quickSub: { color: colors.inkSoft, fontSize: 9, lineHeight: 13, marginTop: 3 },
+  quickLabel: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  quickSub: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 9, lineHeight: 13, marginTop: 3 },
   viewAll: { padding: 5 },
-  viewAllText: { color: colors.coralDark, fontSize: 12, fontWeight: '800' },
-  recentOrder: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderRadius: 18, padding: 11, ...shadow.card },
+  viewAllText: { color: colors.coralDark, fontFamily: fonts.bold, fontSize: 12 },
+  recentOrder: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 12, ...shadow.card },
   avatar: { width: 37, height: 37, borderRadius: 13, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.ink, fontSize: 14, fontWeight: '900' },
+  avatarText: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 14 },
   recentCopy: { flex: 1, gap: 3 },
-  recentName: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  recentMeta: { color: colors.inkSoft, fontSize: 10 },
-  recentTotal: { color: colors.coralDark, fontSize: 13, fontWeight: '800' },
+  recentName: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  recentMeta: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10 },
+  recentTotal: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 13 },
   noOrders: { backgroundColor: colors.white, borderRadius: 18, padding: 18 },
   noOrdersText: { color: colors.inkSoft, fontSize: 12, textAlign: 'center' },
 });

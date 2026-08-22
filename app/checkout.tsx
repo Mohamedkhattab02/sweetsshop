@@ -1,13 +1,13 @@
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, radii } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { buildGoogleMapsUrl } from '@/constants/maps';
 import { formatPrice } from '@/constants/market';
 import { responsive } from '@/constants/responsive';
@@ -19,6 +19,8 @@ const PHONE_ALLOWED = /^[0-9+()\-.\s]+$/;
 export default function CheckoutScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const desktop = Platform.OS === 'web' && width >= 1040;
   const { lines, itemCount, subtotal, isEmpty, placeOrder } = useCart();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -115,15 +117,17 @@ export default function CheckoutScreen() {
     <View style={styles.screen}>
       <ModernHeader title="Almost yours" subtitle="A few details and we’ll get started" showBack onSwitchRole={() => router.replace('/role-selection' as never)} />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, responsive.narrowPage, { paddingBottom: insets.bottom + 35 }]}>
-          <View style={styles.summaryCard}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[styles.content, responsive.mediumPage, { paddingBottom: insets.bottom + 35 }]}>
+          <View style={[styles.checkoutGrid, desktop && styles.checkoutGridDesktop]}>
+          <View style={[styles.summaryCard, desktop && styles.summaryCardDesktop]}>
             <View style={styles.summaryTop}><View><Text style={styles.summaryKicker}>YOUR BOX</Text><Text style={styles.summaryTitle}>{itemCount} little joys</Text></View><Text style={styles.summaryTotal}>{formatPrice(subtotal)}</Text></View>
             <View style={styles.summaryItems}>{lines.map((line) => <View key={line.product.id} style={styles.summaryLine}><Text numberOfLines={1} style={styles.summaryName}>{line.quantity} × {line.product.name}</Text><Text style={styles.summaryPrice}>{formatPrice(line.product.price * line.quantity)}</Text></View>)}</View>
             <View style={styles.summaryFulfillment}><AppIcon name={fulfillment === 'delivery' ? 'address' : 'store'} size={15} color={colors.gold} /><Text style={styles.summaryFulfillmentText}>{fulfillment === 'delivery' ? 'Courier delivery' : 'Pickup at Nour counter'}</Text></View>
           </View>
 
+          <View style={[styles.formColumn, desktop && styles.formColumnDesktop]}>
           <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>How should we get it to you?</Text></View>
-          <View style={styles.fulfillmentRow}>
+          <View style={[styles.fulfillmentRow, desktop && styles.fulfillmentRowDesktop]}>
             <FulfillmentChoice
               selected={fulfillment === 'pickup'}
               icon="store"
@@ -167,6 +171,8 @@ export default function CheckoutScreen() {
 
           <View style={styles.promise}><View style={styles.promiseIcon}><AppIcon name="checkCircle" size={18} color={colors.ink} /></View><View style={styles.promiseCopy}><Text style={styles.promiseTitle}>Your order is in good hands</Text><Text style={styles.promiseText}>We’ll call to confirm timing before we start preparing.</Text></View></View>
           <GSPressable onPress={submit} style={styles.placeButton as never}><Text style={styles.placeText}>Place order · {formatPrice(subtotal)}</Text><AppIcon name="check" size={18} color={colors.white} /></GSPressable>
+          </View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -200,69 +206,75 @@ function Field({ label, icon, value, onChange, placeholder, multiline = false, k
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
   flex: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 17 },
-  summaryCard: { backgroundColor: colors.ink, borderRadius: 23, padding: 17, gap: 16 },
+  content: { paddingHorizontal: 20, paddingTop: 22 },
+  checkoutGrid: { gap: 18 },
+  checkoutGridDesktop: { flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 28 },
+  formColumn: { gap: 17 },
+  formColumnDesktop: { flex: 1, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: 18, padding: 26, ...shadow.card },
+  summaryCard: { backgroundColor: colors.ink, borderRadius: 18, padding: 18, gap: 16 },
+  summaryCardDesktop: { width: 340, padding: 22 },
   summaryTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  summaryKicker: { color: colors.gold, fontSize: 10, fontWeight: '900', letterSpacing: 1.5 },
-  summaryTitle: { color: colors.white, fontSize: 18, fontWeight: '800', marginTop: 4 },
-  summaryTotal: { color: colors.gold, fontSize: 23, fontWeight: '900' },
+  summaryKicker: { color: colors.gold, fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.5 },
+  summaryTitle: { color: colors.white, fontFamily: fonts.bold, fontSize: 18, marginTop: 4 },
+  summaryTotal: { color: colors.gold, fontFamily: fonts.extraBold, fontSize: 23 },
   summaryItems: { gap: 8, paddingTop: 13, borderTopWidth: 1, borderTopColor: '#365048' },
   summaryLine: { flexDirection: 'row', justifyContent: 'space-between', gap: 10 },
-  summaryName: { color: '#C3D1CA', fontSize: 12, flex: 1 },
-  summaryPrice: { color: colors.white, fontSize: 12, fontWeight: '700' },
+  summaryName: { color: '#C9D5CE', fontFamily: fonts.medium, fontSize: 12, flex: 1 },
+  summaryPrice: { color: colors.white, fontFamily: fonts.bold, fontSize: 12 },
   summaryFulfillment: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingTop: 4 },
-  summaryFulfillmentText: { color: colors.gold, fontSize: 11, fontWeight: '700' },
+  summaryFulfillmentText: { color: colors.gold, fontFamily: fonts.bold, fontSize: 11 },
   sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 1 },
-  sectionTitle: { color: colors.ink, fontSize: 21, fontWeight: '800' },
-  required: { color: colors.inkSoft, fontSize: 10 },
-  fulfillmentRow: { gap: 9 },
-  fulfillmentChoice: { minHeight: 70, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderRadius: 18, borderWidth: 1, borderColor: colors.line, padding: 11 },
+  sectionTitle: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 20 },
+  required: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10 },
+  fulfillmentRow: { gap: 10 },
+  fulfillmentRowDesktop: { flexDirection: 'row' },
+  fulfillmentChoice: { flex: 1, minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.white, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 12 },
   fulfillmentChoiceSelected: { borderColor: colors.ink, backgroundColor: colors.ink },
   choiceIcon: { width: 38, height: 38, borderRadius: 13, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
   choiceIconSelected: { backgroundColor: '#2B4840' },
   choiceCopy: { flex: 1, gap: 2 },
-  choiceTitle: { color: colors.ink, fontSize: 12, fontWeight: '800' },
+  choiceTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
   choiceTitleSelected: { color: colors.white },
-  choiceDescription: { color: colors.inkSoft, fontSize: 10 },
+  choiceDescription: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10 },
   choiceDescriptionSelected: { color: '#B8C9C0' },
-  locationCard: { backgroundColor: colors.white, borderRadius: 20, borderWidth: 1, borderColor: colors.line, padding: 14, gap: 10 },
+  locationCard: { backgroundColor: colors.paper, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 14, gap: 10 },
   locationHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   locationIcon: { width: 40, height: 40, borderRadius: 14, backgroundColor: colors.sage, alignItems: 'center', justifyContent: 'center' },
   locationCopy: { flex: 1, gap: 2 },
-  locationTitle: { color: colors.ink, fontSize: 13, fontWeight: '800' },
-  locationText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
+  locationTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 13 },
+  locationText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
   pinReady: { width: 25, height: 25, borderRadius: 13, backgroundColor: '#E5F6EA', alignItems: 'center', justifyContent: 'center' },
-  locationButton: { height: 43, borderRadius: 14, backgroundColor: colors.ink, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
-  locationButtonText: { color: colors.white, fontSize: 11, fontWeight: '800' },
+  locationButton: { height: 43, borderRadius: radii.button, backgroundColor: colors.ink, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
+  locationButtonText: { color: colors.white, fontFamily: fonts.bold, fontSize: 11 },
   previewButton: { height: 34, borderRadius: 11, backgroundColor: colors.cream, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
-  previewText: { color: colors.coralDark, fontSize: 10, fontWeight: '800' },
+  previewText: { color: colors.coralDark, fontFamily: fonts.bold, fontSize: 10 },
   arrow: { transform: [{ rotate: '-90deg' }] },
   coordinates: { color: colors.inkSoft, fontSize: 9, textAlign: 'center' },
   locationMessage: { color: colors.inkSoft, fontSize: 10, lineHeight: 15, textAlign: 'center' },
   addressFields: { flexDirection: 'row', gap: 10 },
   addressColumn: { flex: 1 },
   fieldWrap: { gap: 6 },
-  fieldLabel: { color: colors.ink, fontSize: 12, fontWeight: '800' },
+  fieldLabel: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
   inputWrap: { minHeight: 54, borderRadius: radii.input, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, gap: 9 },
   inputError: { borderColor: '#E8A19A' },
-  input: { flex: 1, color: colors.ink, fontSize: 14, minHeight: 52 },
+  input: { flex: 1, color: colors.ink, fontFamily: fonts.medium, fontSize: 14, minHeight: 52 },
   multiline: { minHeight: 86, paddingTop: 15, textAlignVertical: 'top' },
   hint: { color: colors.inkSoft, fontSize: 10, paddingHorizontal: 2 },
   error: { color: colors.danger, fontSize: 10, paddingHorizontal: 2 },
-  promise: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 18, padding: 13 },
+  promise: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 14, padding: 13 },
   promiseIcon: { width: 33, height: 33, borderRadius: 12, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
   promiseCopy: { flex: 1, gap: 2 },
-  promiseTitle: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  promiseText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
-  pickupNote: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 18, padding: 13 },
+  promiseTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  promiseText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
+  pickupNote: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 14, padding: 13 },
   pickupIcon: { width: 34, height: 34, borderRadius: 12, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
   pickupCopy: { flex: 1, gap: 2 },
-  pickupTitle: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  pickupText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
-  placeButton: { minHeight: 55, borderRadius: 18, backgroundColor: colors.coral, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 1 },
-  placeText: { color: colors.white, fontSize: 14, fontWeight: '800' },
+  pickupTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  pickupText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
+  placeButton: { minHeight: 55, borderRadius: radii.button, backgroundColor: colors.coral, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 1 },
+  placeText: { color: colors.white, fontFamily: fonts.bold, fontSize: 14 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16 },
-  emptyTitle: { color: colors.ink, fontSize: 17, fontWeight: '800' },
+  emptyTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 17 },
   primaryButton: { backgroundColor: colors.coral, borderRadius: 14, paddingHorizontal: 15, paddingVertical: 12 },
-  primaryButtonText: { color: colors.white, fontSize: 12, fontWeight: '800' },
+  primaryButtonText: { color: colors.white, fontFamily: fonts.bold, fontSize: 12 },
 });

@@ -2,52 +2,63 @@
 @import 'uniwind';
 
 @theme {
-  --color-ink: #172824;
-  --color-paper: #fbfaf7;
-  --color-cream: #fff8f2;
-  --color-coral: #ef7d61;
-  --color-coral-dark: #c95b49;
-  --color-sage: #dcebe3;
-  --color-mint: #c7ddd4;
-  --color-gold: #e3ac63;
-  --color-line: #e6e8e2;
-  --font-display: 'Georgia';
+  --color-ink: #1d2622;
+  --color-paper: #f7f8f5;
+  --color-cream: #fff1ea;
+  --color-coral: #e96849;
+  --color-coral-dark: #b94730;
+  --color-sage: #ddebe2;
+  --color-mint: #bcd5c5;
+  --color-gold: #d4a85a;
+  --color-line: #dde3de;
+  --font-display: 'DMSerifDisplay_400Regular';
 }
 
-@media (min-width: 768px) {
-  html,
-  body,
-  #root {
-    min-height: 100%;
-    background: #f6f3ed;
-  }
+html,
+body,
+#root {
+  min-height: 100%;
+  background: #f7f8f5;
+}
 
-  body {
-    margin: 0;
-    overscroll-behavior-y: none;
-    background:
-      radial-gradient(circle at 78% -12%, rgba(239, 125, 97, 0.11), transparent 30rem),
-      radial-gradient(circle at 28% 108%, rgba(199, 221, 212, 0.18), transparent 32rem),
-      #f6f3ed;
-  }
+body {
+  margin: 0;
+  color: #1d2622;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  [role='button'],
-  [role='link'] {
-    cursor: pointer;
-  }
+input,
+textarea,
+button {
+  font-family: 'Manrope_400Regular', system-ui, sans-serif;
+}
 
-  ::selection {
-    color: #172824;
-    background: #f5d2c7;
-  }
+[role='button'],
+[role='link'] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
 
-  * {
-    scrollbar-color: #c7d8d0 transparent;
-    scrollbar-width: thin;
-  }
+::selection {
+  color: #1d2622;
+  background: #f8d9d0;
+}
 
+* {
+  box-sizing: border-box;
+  scrollbar-color: #bdc9c2 transparent;
+  scrollbar-width: thin;
+}
+
+*:focus-visible {
+  outline: 3px solid rgba(233, 104, 73, 0.34);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
   *:focus-visible {
-    outline: 3px solid rgba(239, 125, 97, 0.42);
-    outline-offset: 3px;
+    outline-width: 2px;
   }
 }

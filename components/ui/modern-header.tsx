@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
-import { colors, radii } from '@/constants/design';
+import { colors, fonts, radii } from '@/constants/design';
 
 type Props = {
   eyebrow?: string;
@@ -104,7 +104,9 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: Platform.OS === 'web' ? 32 : 20,
     paddingBottom: 12,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
   },
   row: {
     flexDirection: 'row',
@@ -124,17 +126,16 @@ const styles = StyleSheet.create({
   logoMark: {
     width: 38,
     height: 38,
-    borderRadius: 14,
-    backgroundColor: colors.ink,
+    borderRadius: 11,
+    backgroundColor: colors.coral,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoLetter: {
-    color: colors.gold,
-    fontFamily: 'Georgia',
+    color: colors.white,
+    fontFamily: fonts.display,
     fontSize: 25,
     lineHeight: 28,
-    fontWeight: '700',
   },
   heading: {
     flex: 1,
@@ -143,18 +144,19 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: colors.coralDark,
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: fonts.extraBold,
     letterSpacing: 1.4,
     textTransform: 'uppercase',
   },
   title: {
     color: colors.ink,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: fonts.extraBold,
     letterSpacing: -0.4,
   },
   subtitle: {
     color: colors.inkSoft,
+    fontFamily: fonts.medium,
     fontSize: 12,
     marginTop: 2,
   },
@@ -166,8 +168,10 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 44,
     height: 44,
-    borderRadius: 16,
-    backgroundColor: colors.white,
+    borderRadius: 12,
+    backgroundColor: colors.paper,
+    borderWidth: 1,
+    borderColor: colors.line,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -186,7 +190,7 @@ const styles = StyleSheet.create({
   countText: {
     color: colors.white,
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: fonts.extraBold,
   },
   ownerPill: {
     flexDirection: 'row',
@@ -194,12 +198,14 @@ const styles = StyleSheet.create({
     gap: 5,
     borderRadius: radii.pill,
     backgroundColor: colors.cream,
+    borderWidth: 1,
+    borderColor: colors.coralSoft,
     paddingHorizontal: 12,
     paddingVertical: 9,
   },
   ownerPillText: {
     color: colors.coralDark,
     fontSize: 11,
-    fontWeight: '800',
+    fontFamily: fonts.bold,
   },
 });

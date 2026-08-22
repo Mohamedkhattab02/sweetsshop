@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice, getCategory, getMarketStatus } from '@/constants/market';
 import { responsive } from '@/constants/responsive';
 import { MAX_QUANTITY_PER_LINE, useCart } from '@/store/cart';
@@ -78,38 +78,38 @@ export default function ProductDetailScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 18 },
-  contentDesktop: { flexDirection: 'row', alignItems: 'flex-start', gap: 34, paddingTop: 28 },
-  imageWrap: { height: 330, borderRadius: 28, overflow: 'hidden', backgroundColor: colors.sage, position: 'relative', ...shadow.card },
-  imageWrapDesktop: { width: '48%', height: 520, borderRadius: 32 },
+  content: { paddingHorizontal: 20, paddingTop: 18, gap: 18 },
+  contentDesktop: { flexDirection: 'row', alignItems: 'stretch', gap: 28, paddingTop: 32 },
+  imageWrap: { height: 330, borderRadius: 18, overflow: 'hidden', backgroundColor: colors.sage, position: 'relative', ...shadow.card },
+  imageWrapDesktop: { width: '48%', height: 540, borderRadius: 20 },
   imageFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   imageBadge: { position: 'absolute', left: 15, top: 15, backgroundColor: 'rgba(255,255,255,0.88)', borderRadius: radii.pill, paddingHorizontal: 10, paddingVertical: 7 },
-  imageBadgeText: { color: colors.ink, fontSize: 9, fontWeight: '900', letterSpacing: 1.1 },
-  body: { gap: 11 },
-  bodyDesktop: { flex: 1, paddingTop: 14 },
+  imageBadgeText: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 9, letterSpacing: 1.1 },
+  body: { gap: 12 },
+  bodyDesktop: { flex: 1, padding: 30, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: 20 },
   tagRow: { flexDirection: 'row', gap: 8 },
   tag: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: radii.pill, backgroundColor: colors.sage, paddingHorizontal: 10, paddingVertical: 7 },
-  tagText: { color: colors.ink, fontSize: 11, fontWeight: '700' },
+  tagText: { color: colors.ink, fontFamily: fonts.semibold, fontSize: 11 },
   tagCoral: { backgroundColor: colors.cream },
-  tagCoralText: { color: colors.coralDark, fontSize: 11, fontWeight: '700' },
-  title: { color: colors.ink, fontFamily: 'Georgia', fontSize: 32, lineHeight: 36, fontWeight: '700', letterSpacing: -0.5 },
+  tagCoralText: { color: colors.coralDark, fontFamily: fonts.semibold, fontSize: 11 },
+  title: { color: colors.ink, fontFamily: fonts.display, fontSize: 34, lineHeight: 38, letterSpacing: -0.45 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5 },
-  price: { color: colors.coralDark, fontSize: 24, fontWeight: '900' },
-  unit: { color: colors.inkSoft, fontSize: 12 },
-  weight: { color: colors.inkSoft, fontSize: 12 },
-  description: { color: colors.inkSoft, fontSize: 15, lineHeight: 23, marginTop: 2 },
-  infoCard: { backgroundColor: colors.white, borderRadius: 20, padding: 14, gap: 11, marginTop: 4 },
+  price: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 24 },
+  unit: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12 },
+  weight: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12 },
+  description: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 15, lineHeight: 24, marginTop: 2 },
+  infoCard: { backgroundColor: colors.paper, borderRadius: 14, borderWidth: 1, borderColor: colors.line, padding: 14, gap: 11, marginTop: 4 },
   infoLine: { flexDirection: 'row', alignItems: 'center', gap: 9 },
-  infoText: { color: colors.inkSoft, fontSize: 12, flex: 1 },
+  infoText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 12, flex: 1 },
   quantityHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
-  quantityLabel: { color: colors.ink, fontSize: 15, fontWeight: '800' },
+  quantityLabel: { color: colors.ink, fontFamily: fonts.bold, fontSize: 15 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   stepperButton: { width: 34, height: 34, borderRadius: 12, borderWidth: 1, borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
   stepperFilled: { backgroundColor: colors.ink, borderColor: colors.ink },
-  quantity: { color: colors.ink, fontSize: 16, fontWeight: '900', minWidth: 18, textAlign: 'center' },
-  addButton: { height: 55, borderRadius: 18, backgroundColor: colors.coral, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 2 },
-  addButtonText: { color: colors.white, fontSize: 14, fontWeight: '800' },
+  quantity: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 16, minWidth: 18, textAlign: 'center' },
+  addButton: { height: 55, borderRadius: radii.button, backgroundColor: colors.coral, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 2 },
+  addButtonText: { color: colors.white, fontFamily: fonts.bold, fontSize: 14 },
   disabled: { opacity: 0.45 },
   missing: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  missingTitle: { color: colors.ink, fontSize: 17, fontWeight: '700', textAlign: 'center' },
+  missingTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 17, textAlign: 'center' },
 });

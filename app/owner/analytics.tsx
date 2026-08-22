@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { ModernHeader } from '@/components/ui/modern-header';
-import { colors, radii, shadow } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { formatPrice } from '@/constants/market';
 import { responsive } from '@/constants/responsive';
 import { useCart } from '@/store/cart';
@@ -38,38 +38,38 @@ function Kpi({ icon, label, value }: { icon: 'checkout' | 'store' | 'sparkle'; l
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 15 },
+  content: { paddingHorizontal: 20, paddingTop: 22, gap: 16 },
   period: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  periodTitle: { color: colors.ink, fontSize: 16, fontWeight: '800' },
+  periodTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 16 },
   periodPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.cloud, borderRadius: radii.pill, paddingHorizontal: 9, paddingVertical: 7 },
-  periodText: { color: colors.inkSoft, fontSize: 10, fontWeight: '700' },
-  heroMetric: { backgroundColor: colors.ink, borderRadius: 24, padding: 18, minHeight: 190, overflow: 'hidden' },
+  periodText: { color: colors.inkSoft, fontFamily: fonts.semibold, fontSize: 10 },
+  heroMetric: { backgroundColor: colors.ink, borderRadius: 18, padding: 20, minHeight: 200, overflow: 'hidden' },
   heroMetricTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   metricIcon: { width: 33, height: 33, borderRadius: 12, backgroundColor: '#2B4840', alignItems: 'center', justifyContent: 'center' },
-  heroMetricLabel: { color: '#B8C9C0', fontSize: 10, fontWeight: '900', letterSpacing: 1.4 },
-  heroValue: { color: colors.white, fontSize: 35, fontWeight: '900', marginTop: 12 },
-  heroHelper: { color: '#B8C9C0', fontSize: 11, marginTop: 2 },
+  heroMetricLabel: { color: '#C5D1CB', fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.4 },
+  heroValue: { color: colors.white, fontFamily: fonts.extraBold, fontSize: 35, marginTop: 12 },
+  heroHelper: { color: '#C5D1CB', fontFamily: fonts.medium, fontSize: 11, marginTop: 2 },
   sparkBars: { position: 'absolute', left: 18, right: 18, bottom: 0, height: 55, flexDirection: 'row', alignItems: 'flex-end', gap: 5, opacity: 0.9 },
   sparkBar: { flex: 1, borderTopLeftRadius: 3, borderTopRightRadius: 3 },
   kpiRow: { flexDirection: 'row', gap: 10 },
-  kpi: { flex: 1, backgroundColor: colors.white, borderRadius: 18, padding: 11, gap: 3, ...shadow.card },
+  kpi: { flex: 1, backgroundColor: colors.white, borderRadius: 15, borderWidth: 1, borderColor: colors.line, padding: 12, gap: 3, ...shadow.card },
   kpiIcon: { width: 29, height: 29, borderRadius: 10, backgroundColor: colors.cream, alignItems: 'center', justifyContent: 'center', marginBottom: 5 },
-  kpiValue: { color: colors.ink, fontSize: 19, fontWeight: '900' },
-  kpiLabel: { color: colors.inkSoft, fontSize: 10 },
-  card: { backgroundColor: colors.white, borderRadius: 22, padding: 16, gap: 14, ...shadow.card },
+  kpiValue: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 19 },
+  kpiLabel: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10 },
+  card: { backgroundColor: colors.white, borderRadius: 16, borderWidth: 1, borderColor: colors.line, padding: 18, gap: 14, ...shadow.card },
   cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 },
-  kicker: { color: colors.coralDark, fontSize: 10, fontWeight: '900', letterSpacing: 1.4, marginBottom: 4 },
-  cardTitle: { color: colors.ink, fontSize: 19, fontWeight: '800' },
+  kicker: { color: colors.coralDark, fontFamily: fonts.extraBold, fontSize: 10, letterSpacing: 1.5, marginBottom: 4 },
+  cardTitle: { color: colors.ink, fontFamily: fonts.extraBold, fontSize: 19 },
   categoryRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   categoryName: { width: 92, flexDirection: 'row', alignItems: 'center', gap: 6 },
   categoryDot: { width: 7, height: 7, borderRadius: 4 },
-  categoryText: { color: colors.inkSoft, fontSize: 11, textTransform: 'capitalize' },
+  categoryText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11, textTransform: 'capitalize' },
   barTrack: { flex: 1, height: 8, borderRadius: 4, backgroundColor: colors.cloud, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 4 },
-  categoryCount: { color: colors.ink, fontSize: 11, fontWeight: '800', width: 16, textAlign: 'right' },
-  tip: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 19, padding: 13 },
+  categoryCount: { color: colors.ink, fontFamily: fonts.bold, fontSize: 11, width: 16, textAlign: 'right' },
+  tip: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 14, padding: 13 },
   tipIcon: { width: 33, height: 33, borderRadius: 12, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
   tipCopy: { flex: 1, gap: 3 },
-  tipTitle: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  tipText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
+  tipTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  tipText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
 });

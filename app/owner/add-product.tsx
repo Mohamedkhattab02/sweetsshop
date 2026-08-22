@@ -7,7 +7,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { GSPressable } from '@/components/ui/gluestack';
 import { ModernHeader } from '@/components/ui/modern-header';
 import { CATEGORIES, type CategoryId } from '@/constants/market';
-import { colors, radii } from '@/constants/design';
+import { colors, fonts, radii, shadow } from '@/constants/design';
 import { responsive } from '@/constants/responsive';
 import { useProducts } from '@/store/products';
 
@@ -56,25 +56,25 @@ function Field({ label, value, onChange, placeholder, multiline = false, keyboar
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
   flex: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 8, gap: 17 },
-  intro: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 19, padding: 13 },
+  content: { paddingHorizontal: 20, paddingTop: 22, gap: 18 },
+  intro: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.sage, borderRadius: 14, padding: 14 },
   introIcon: { width: 37, height: 37, borderRadius: 13, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center' },
   introCopy: { flex: 1, gap: 2 },
-  introTitle: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  introText: { color: colors.inkSoft, fontSize: 10, lineHeight: 15 },
+  introTitle: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  introText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 10, lineHeight: 15 },
   twoFields: { flexDirection: 'row', gap: 12 },
   half: { flex: 1 },
   fieldWrap: { gap: 6 },
-  label: { color: colors.ink, fontSize: 12, fontWeight: '800' },
-  input: { height: 53, borderRadius: radii.input, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, color: colors.ink, fontSize: 14, paddingHorizontal: 14 },
+  label: { color: colors.ink, fontFamily: fonts.bold, fontSize: 12 },
+  input: { height: 54, borderRadius: radii.input, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, color: colors.ink, fontFamily: fonts.medium, fontSize: 14, paddingHorizontal: 14, ...shadow.card },
   multiline: { height: 104, paddingTop: 14, textAlignVertical: 'top' },
   categoryRow: { gap: 8 },
   category: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.white, borderRadius: radii.pill, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 11, paddingVertical: 9 },
   categorySelected: { backgroundColor: colors.ink, borderColor: colors.ink },
-  categoryText: { color: colors.ink, fontSize: 10, fontWeight: '700' },
+  categoryText: { color: colors.ink, fontFamily: fonts.semibold, fontSize: 10 },
   categoryTextSelected: { color: colors.white },
-  imageHint: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.cream, borderRadius: 15, padding: 12 },
-  imageHintText: { color: colors.inkSoft, fontSize: 11, flex: 1 },
-  saveButton: { height: 54, borderRadius: 17, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 9 },
-  saveText: { color: colors.white, fontSize: 14, fontWeight: '800' },
+  imageHint: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.cream, borderRadius: 13, borderWidth: 1, borderColor: colors.coralSoft, padding: 12 },
+  imageHintText: { color: colors.inkSoft, fontFamily: fonts.medium, fontSize: 11, flex: 1 },
+  saveButton: { height: 54, borderRadius: radii.button, backgroundColor: colors.coral, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 9 },
+  saveText: { color: colors.white, fontFamily: fonts.bold, fontSize: 14 },
 });
