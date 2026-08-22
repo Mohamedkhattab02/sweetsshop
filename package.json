@@ -8,8 +8,13 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "web:build": "expo export --platform web && node scripts/prepare-sites-build.cjs",
+    "build": "expo export --platform web",
+    "web:build": "npm run build",
+    "sites:build": "npm run build && node scripts/prepare-sites-build.cjs",
     "lint": "expo lint"
+  },
+  "engines": {
+    "node": ">=24.0.0 <25"
   },
   "dependencies": {
     "@expo-google-fonts/dm-serif-display": "^0.4.2",
